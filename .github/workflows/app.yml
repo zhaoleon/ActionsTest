@@ -1,0 +1,174 @@
+name: "NCar-Unreal-Builder"
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: "The version of the app to be built"
+        required: true
+        default: "0.1.2400.1"
+      environment:
+        description: "The deployment environment"
+        required: true
+        type: choice
+        options:
+          - "DEV"
+          - "UAT"
+          - "PROD"
+        default: "DEV"
+      changelog:
+        description: "Built app changelog"
+        required: true
+        default: "Test"
+      upload_artifacts:
+        description: "Enable upload of the app artifact to Github"
+        type: boolean
+        default: false
+      build_config:
+        description: "Configuration to use"
+        type: choice
+        required: true
+        options:
+          - "Development"
+          - "Debug"
+          - "Shipping"
+        default: "Development"
+      platform:
+        description: "Platform to build for"
+        type: choice
+        required: false
+        options:
+          - "Win64"
+          - "Linux"
+        default: "Linux"
+      cook:
+        description: 'Whether to cook'
+        required: false
+        default: 'true'
+      stage:
+        description: 'Whether to stage'
+        required: false
+        default: 'true'
+      package:
+        description: 'Whether to package'
+        required: false
+        default: 'false'
+      pak:
+        description: 'Whether to pak files'
+        required: false
+        default: 'false'
+      archive:
+        description: 'Whether to archive'
+        required: false
+        default: 'false'
+      archive_path:
+        description: 'Archive Path'
+        required: false
+      clean:
+        description: 'clean'
+        required: false
+        default: 'true'
+      encrypt_ini:
+        description: 'Encrypt INI Files'
+        required: false
+        default: 'false'
+      release:
+        description: 'Create Release Version (Enter new release version number)'
+        required: false
+        default: 'false'
+      patch:
+        description: 'Generate a patch based on a release version (enter based on release version number)'
+        required: false
+        default: 'false'
+      maps:
+        description: 'Maps to build and package (comma separated list of maps, leave empty for all maps)'
+        required: false
+        default: 'true'
+      delete_pdb:
+        description: 'Delete PDB (debug) files'
+        required: false
+        default: 'false'
+      anticheat_enabled:
+        description: 'Enable anticheat'
+        required: false
+        default: 'false'
+      anticheat_private_key:
+        description: 'Base64 encoded private key for anticheat'
+        required: false
+      anticheat_public_cert:
+        description: 'Base64 encoded public certificate for anticheat'
+        required: false  
+
+run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environment) }}
+
+jobs:
+  build-app:
+      runs-on: self-hosted
+        
+      steps:
+        - uses: actions/checkout@v4
+          with: 
+            lfs: true
+
+        - run: |
+            #!/bin/bash
+
+            runUatPath="/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
+            uprojectPath="${{ github.workspace }}"
+            uprojectDir=$(dirname "$uprojectPath")
+            buildConfig="${{ inputs.build_config }}"
+            platform="${{ inputs.platform }}"
+            cook="${{ inputs.cook }}"
+            stage="${{ inputs.stage }}"
+            pak="${{ inputs.pak }}"
+            package="${{ inputs.package }}"
+            archive="${{ inputs.archive }}"
+            clean="${{inputs.clean}}"
+            archivePath="${{ inputs.archive_path }}"
+            encryptIni="${{ inputs.encrypt_ini }}"
+            release="${{ inputs.release }}"
+            patch="${{ inputs.patch }}"
+            maps="${{ inputs.maps }}"
+            deletePdb="${{ inputs.delete_pdb }}"
+            anticheatEnabled="${{ inputs.anticheat_enabled }}"
+            anticheatPrivateKey="${{ inputs.anticheat_private_key }}"
+            anticheatPublicCert="${{ inputs.anticheat_public_cert }}"
+
+            if [ "$anticheatEnabled" = 'true' ]; then
+            anticheatDir="$uprojectDir/Build/NoRedist"
+            mkdir -p "$anticheatDir"
+            privateKeyPath="$anticheatDir/base_private.key"
+            publicCertPath="$anticheatDir/base_public.cer"
+            echo "$anticheatPrivateKey" | base64 --decode > "$privateKeyPath"
+            echo "$anticheatPublicCert" | base64 --decode > "$publicCertPath"
+            echo "Anticheat keys have been written to $anticheatDir"
+            fi
+
+            cleanArg=$( [ "$clean" = 'true' ] && echo "-clean" )
+            cookArg=$( [ "$cook" = 'true' ] && echo "-cook" )
+            stageArg=$( [ "$stage" = 'true' ] && echo "-stage" )
+            pakArg=$( [ "$pak" = 'true' ] && echo "-pak" )
+            packageArg=$( [ "$package" = 'true' ] && echo "-package" )
+            archiveArg=$( [ "$archive" = 'true' ] && echo "-archive -archivedirectory=$archivePath" )
+            editorArg=$( [ "$archive" = 'true' ] && echo "-nocompileeditor" )
+            encryptIniArg=$( [ "$encryptIni" = 'true' ] && echo "-encryptinifiles" )
+            releaseArg=$( [ "$release" != 'false' ] && echo "-createreleaseversion=$release" )
+            patchArg=$( [ "$patch" != 'false' ] && echo "-generatepatch -basedonreleaseversion=$patch" )
+            mapsArg=$( [ "$maps" = 'true' ] && echo "" || echo "-map=$maps" )
+
+            command="\"$runUatPath\" BuildCookRun " +
+            "-project=\" \"$uprojectPath\ActionsTest.uproject" \" " +
+            "-clientconfig=$buildConfig -platform=$platform $mapsArg " +
+            "$cleanArg $cookArg $stageArg $pakArg $packageArg $archiveArg $editorArg $encryptIniArg $releaseArg $patchArg " +
+            "-noP4 -build -unattended -utf8output"
+
+            echo "Executing command: $command"
+
+            # Since direct execution of $command in Bash requires proper escaping and command formatting,
+            # the actual invocation would need to be adjusted based on the specific command syntax.
+            # The following is a placeholder for the actual command execution.
+            sh -c "$command"
+
+            if [ "$deletePdb" = 'true' ]; then
+            find "$uprojectDir/Saved/StagedBuilds/" -type f -name "*.pdb" -exec rm -f {} \;
+            fi
