@@ -67,10 +67,10 @@ jobs:
         # TODO: check the workspace and delete the old version
         - run: |
             pwd
-            
-        - uses: actions/checkout@v4
-          with: 
-            lfs: true
+
+        # - uses: actions/checkout@v4
+        #   with: 
+        #     lfs: true
 
         # - run: |
         #     Scripts/buildcookrun.sh \
