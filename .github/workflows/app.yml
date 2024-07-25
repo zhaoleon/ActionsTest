@@ -68,8 +68,7 @@ jobs:
         # TODO: check the workspace and delete the old version
         - run: |
             echo "Deleting existing workspace: ${{ github.workspace }}"
-            cd ${${{ github.workspace }}%/*}
-            pwd
+            cd $(${{ github.workspace }})/..
             # rm -rf 
 
         # - uses: actions/checkout@v4
