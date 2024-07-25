@@ -41,6 +41,9 @@ on:
           - "Win64"
           - "Linux"
         default: "Linux"
+      maps:
+        description: "Maps to be packaged"
+        required: false
       archive:
         description: 'Whether to archive'
         required: false
@@ -61,4 +64,4 @@ jobs:
             lfs: true
 
         - run: |
-            Scripts/buildcookrun.sh
+            Scripts/buildcookrun.sh ${{ inputs.build_config }} ${{ inputs.platform }} ${{inputs.archive}} ${{ inputs.archive_path }} ${{ inputs.maps}} 
