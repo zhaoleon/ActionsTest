@@ -26,4 +26,4 @@ mapsArg=$( [ "$maps" = 'true' ] && echo "" || echo "-map=$maps" )
 command="$runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$buildConfig -platform=$platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
 
 echo -e "buildcookrun commandline is:\n"$command
-#sh -c "$command"
+sh -c "$command"
