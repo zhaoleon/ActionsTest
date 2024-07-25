@@ -64,12 +64,16 @@ jobs:
       runs-on: self-hosted
         
       steps:
+        # TODO: check the workspace and delete the old version
+        - run: |
+            pwd
+            
         - uses: actions/checkout@v4
           with: 
             lfs: true
 
-        - run: |
-            Scripts/buildcookrun.sh \
-            ${{ inputs.build_config }} ${{ inputs.platform }} \
-            ${{inputs.archive}} ${{ inputs.app_version }} \
-            ${{ inputs.archive_path }} ${{ inputs.maps}} 
+        # - run: |
+        #     Scripts/buildcookrun.sh \
+        #     ${{ inputs.build_config }} ${{ inputs.platform }} \
+        #     ${{inputs.archive}} ${{ inputs.app_version }} \
+        #     ${{ inputs.archive_path }} ${{ inputs.maps}} 

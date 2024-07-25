@@ -8,7 +8,6 @@ app_version=${4:-"0.1.2400.1"}
 archivePath=${5:-"/home/ubuntu/ActionsWorkflowOutput/"}
 maps=$6 #"false"
 
-
 # Make sure there is only one uproject file in the project.
 uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
 if [ "$uprojectCount" != 1 ]; then
