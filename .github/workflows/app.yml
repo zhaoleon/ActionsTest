@@ -66,7 +66,7 @@ jobs:
       steps:
         # TODO: check the workspace and delete the old version
         - run: |
-            echo ${{ github.action }}
+            echo ${{ github.job }}
 
         # - uses: actions/checkout@v4
         #   with: 
