@@ -6,6 +6,7 @@ platform=$2 #"linux"
 archive=$3 #"true"
 archivePath=${4:-"/home/ubuntu/ActionsWorkflowOutput/"}
 maps=$5 #"false"
+app_version=${6:-"0.1.2400.1"}
 
 # Make sure there is only one uproject file in the project.
 uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
@@ -24,4 +25,11 @@ command="$runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$buildCon
 
 echo -e "buildcookrun commandline is:\n"$command
 sh -c "$command"
+
+# Rename the archive to add the version number
+for dir in $archivePath/*
+do
+	new_name=$dir"_"$app_version
+	mv "$dir" "$new_name/"
+done
 

@@ -68,4 +68,7 @@ jobs:
             lfs: true
 
         - run: |
-            Scripts/buildcookrun.sh ${{ inputs.build_config }} ${{ inputs.platform }} ${{inputs.archive}} ${{ inputs.archive_path }} ${{ inputs.maps}} 
+            Scripts/buildcookrun.sh \
+            ${{ inputs.build_config }} ${{ inputs.platform }} \
+            ${{inputs.archive}} ${{ inputs.archive_path }} \
+            ${{ inputs.maps}} ${{ inputs.app_version }} 
