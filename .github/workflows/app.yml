@@ -46,7 +46,11 @@ on:
         required: false
       archive:
         description: 'Whether to archive'
+        type: choice
         required: false
+        options:
+          - "true"
+          - "false"
         default: 'false'
       archive_path:
         description: 'Archive Path'
