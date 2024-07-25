@@ -55,6 +55,7 @@ on:
       archive_path:
         description: 'Archive Path'
         required: false
+        default: "$HOME/ActionsOutput/"
 
 run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environment) }}
 
@@ -70,5 +71,5 @@ jobs:
         - run: |
             Scripts/buildcookrun.sh \
             ${{ inputs.build_config }} ${{ inputs.platform }} \
-            ${{inputs.archive}} ${{ inputs.archive_path }} \
-            ${{ inputs.maps}} ${{ inputs.app_version }} 
+            ${{inputs.archive}} ${{ inputs.app_version }} \
+            ${{ inputs.archive_path }} ${{ inputs.maps}} 

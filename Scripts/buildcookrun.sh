@@ -4,9 +4,10 @@ runUatPath="/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/Ru
 buildConfig=$1 #"Development"
 platform=$2 #"linux"
 archive=$3 #"true"
-archivePath=${4:-"/home/ubuntu/ActionsWorkflowOutput/"}
-maps=$5 #"false"
-app_version=${6:-"0.1.2400.1"}
+app_version=${4:-"0.1.2400.1"}
+archivePath=${5:-"/home/ubuntu/ActionsWorkflowOutput/"}
+maps=$6 #"false"
+
 
 # Make sure there is only one uproject file in the project.
 uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
