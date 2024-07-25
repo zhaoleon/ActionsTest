@@ -75,11 +75,18 @@ jobs:
             echo "${{ github.event }}"
             echo "${{ github.event_path }}"
             echo "${{ github.event_name }}"
-            echo "${{ github.base_ref }}"
             echo "${{ github.ref }}"
             echo "${{ github.ref_name }}"
             echo "${{ github.ref_type }}"
             echo "${{ github.workflow }}"
+            echo "${{ job.status }}"
+            echo "${{ github.path }}"
+            echo "${{ github.repository }}"
+            echo "${{ github.repository_id }}"
+            echo "${{ github.repositoryUrl }}"
+            echo "${{ github.workspace }}"
+            echo "${{ github.workflow_ref }}"
+            "
 
         # - uses: actions/checkout@v4
         #   with: 
