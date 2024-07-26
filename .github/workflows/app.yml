@@ -1,64 +1,60 @@
-name: "NCar-Unreal-Builder"
+name: 'NCar-Unreal-Builder'
+run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environment) }}
 
 on:
   push:
   workflow_dispatch:
     inputs:
       app_version:
-        description: "The version of the app to be built"
+        description: 'The version of the app to be built'
         required: true
-        default: "0.1.2400.1"
+        default: '0.1.2400.1'
       environment:
-        description: "The deployment environment"
+        description: 'The deployment environment'
         required: true
         type: choice
         options:
-          - "DEV"
-          - "UAT"
-          - "PROD"
-        default: "DEV"
-      changelog:
-        description: "Built app changelog"
-        required: true
-        default: "Test"
-      upload_artifacts:
-        description: "Enable upload of the app artifact to Github"
-        type: boolean
-        default: false
+          - 'DEV'
+          - 'UAT'
+          - 'PROD'
+        default: 'DEV'
       build_config:
-        description: "Configuration to use"
+        description: 'Configuration to use'
         type: choice
         required: true
         options:
-          - "Development"
-          - "Debug"
-          - "Shipping"
-        default: "Development"
+          - 'Development'
+          - 'Debug'
+          - 'Shipping'
+        default: 'Development'
       platform:
-        description: "Platform to build for"
+        description: 'Platform to build for'
         type: choice
         required: false
         options:
-          - "Win64"
-          - "Linux"
-        default: "Linux"
+          - 'Win64'
+          - 'Linux'
+        default: 'Linux'
       maps:
-        description: "Maps to be packaged"
+        description: 'Maps to be packaged'
         required: false
       archive:
         description: 'Whether to archive'
-        type: choice
+        type: boolean
         required: false
-        options:
-          - "true"
-          - "false"
-        default: 'false'
+        default: true
       archive_path:
         description: 'Archive Path'
         required: false
-        default: "$HOME/ActionsOutput/"
+        default: '$HOME/ActionsOutput/'
 
-run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environment) }}
+env: 
+  app_version: ${{ inputs.app_version || '0.1.2400.1' }}
+  environment: ${{ inputs.environment || 'DEV' }} 
+  build_config: ${{ inputs.build_config || 'Development' }} 
+  platform: ${{ inputs.platform || 'Linux' }} 
+  archive: ${{ inputs.archive && true }}
+  archive_path: ${{ inputs.archive_path && '$HOME/ActionsOutput/' }}
 
 jobs:
   build-app:
@@ -67,7 +63,7 @@ jobs:
     steps:
       # Clean the workspace by deleting the old version
       - run: |
-          echo "Deleting existing workspace: ${{ github.workspace }}"
+          echo 'Deleting existing workspace: ${{ github.workspace }}'
           rm -rf ${{ github.workspace }}/*
 
       - uses: actions/checkout@v4
@@ -81,14 +77,18 @@ jobs:
           ${{ inputs.archive_path }} ${{ inputs.maps}} 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
+
     name: Create Release
     needs: build-app
+    
     env: 
       ArchiveName: NCarApp_${{ github.run_number }}.zip
+    
     steps:
       - name: Zip archive
         run: |
           zip -rqu ${{env.ArchiveName}} ${{ inputs.archive_path }}
+
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -103,6 +103,7 @@ jobs:
             - Second change
           draft: false
           prerelease: true
+          
       - name: Upload release asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
