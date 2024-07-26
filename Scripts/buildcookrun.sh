@@ -8,6 +8,10 @@ app_version=${4:-"0.1.2400.1"}
 archivePath=$5
 maps=$6 #"false"
 
+if [ "${archivePath:-1}"!="/"];then
+	archivePath="$archivePath/"
+fi
+
 # Make sure there is only one uproject file in the project.
 uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
 if [ "$uprojectCount" != 1 ]; then
@@ -27,9 +31,9 @@ echo -e "buildcookrun commandline is:\n"$command
 sh -c "$command"
 
 # Rename the archive to add the version number
-for dir in $archivePath/*
+for dir in $archivePath*
 do
 	new_name=$dir"_"$app_version
-	mv "$dir" "$new_name/"
+	mv "$dir" "$new_name"
 done
 
