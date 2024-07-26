@@ -55,7 +55,7 @@ env:
   archive: ${{ inputs.archive && true }}
   archive_path: ${{ inputs.archive_path != '' && '$HOME/ActionsOutput/' || '$HOME/ActionsOutput/' }}
 
-run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }} | ${{ env.app_version }} | ${{ env.environment }} 
+run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }}
 
 jobs:
   build-app:
