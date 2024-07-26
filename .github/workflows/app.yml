@@ -78,6 +78,7 @@ jobs:
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
+    if: startsWith(github.ref, 'refs/tags')
 
     name: Create Release
     needs: build-app
@@ -91,6 +92,7 @@ jobs:
     
     steps:
       - name: Zip archive
+        if: ${{ github.ref.tag_name }}
         run: |
           echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}'
           zip -rqu ${{env.ArchiveName}} .
