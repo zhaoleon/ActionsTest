@@ -62,7 +62,7 @@ run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environ
 
 jobs:
   build-app:
-      runs-on: ActionsCICDRunner
+      runs-on: [ self-hosted, CITestRunner ]
         
       steps:
         # TODO: check the workspace and delete the old version
