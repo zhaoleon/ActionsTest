@@ -1,5 +1,4 @@
 name: 'NCar-Unreal-Builder'
-run-name: ${{ format('App build | {0} | {1}', inputs.app_version, inputs.environment) }}
 
 on:
   push:
@@ -56,6 +55,8 @@ env:
   archive: ${{ inputs.archive && true }}
   archive_path: ${{ inputs.archive_path && '$HOME/ActionsOutput/' }}
 
+run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }} 
+
 jobs:
   build-app:
     runs-on: [self-hosted, CICDForUnreal, Linux]
@@ -87,6 +88,7 @@ jobs:
     steps:
       - name: Zip archive
         run: |
+          echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ inputs.archive_path }}'
           zip -rqu ${{env.ArchiveName}} ${{ inputs.archive_path }}
 
       - name: Create release
