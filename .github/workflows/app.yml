@@ -48,14 +48,14 @@ on:
         default: '$HOME/ActionsOutput/'
 
 env: 
-  app_version: ${{ inputs.app_version || '0.1.2400.1' }}
-  environment: ${{ inputs.environment || 'DEV' }} 
-  build_config: ${{ inputs.build_config || 'Development' }} 
-  platform: ${{ inputs.platform || 'Linux' }} 
+  app_version: ${{ inputs.app_version !='' && '0.1.2400.1' || '0.1.2400.1' }}
+  environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
+  build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
+  platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
   archive: ${{ inputs.archive && true }}
-  archive_path: ${{ inputs.archive_path && '$HOME/ActionsOutput/' }}
+  archive_path: ${{ inputs.archive_path != '' && '$HOME/ActionsOutput/' || '$HOME/ActionsOutput/' }}
 
-run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }} 
+run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }} | ${{ env.app_version }} | ${{ env.environment }} 
 
 jobs:
   build-app:
@@ -73,9 +73,9 @@ jobs:
 
       - run: |
           Scripts/buildcookrun.sh \
-          ${{ inputs.build_config }} ${{ inputs.platform }} \
-          ${{inputs.archive}} ${{ inputs.app_version }} \
-          ${{ inputs.archive_path }} ${{ inputs.maps}} 
+          ${{ env.build_config }} ${{ env.platform }} \
+          ${{ env.archive }} ${{ env.app_version }} \
+          ${{ env.archive_path }} ${{ inputs.maps}} 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
 
@@ -88,8 +88,8 @@ jobs:
     steps:
       - name: Zip archive
         run: |
-          echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ inputs.archive_path }}'
-          zip -rqu ${{env.ArchiveName}} ${{ inputs.archive_path }}
+          echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}'
+          zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}
 
       - name: Create release
         id: create_release
