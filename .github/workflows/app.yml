@@ -80,6 +80,11 @@ jobs:
     runs-on: [self-hosted, CICDForUnreal, Linux]
     if: ${{ startsWith(github.ref, 'refs/tags') }}
 
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
     name: Create Release
     needs: build-app
     
