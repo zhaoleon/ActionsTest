@@ -75,12 +75,17 @@ jobs:
           ${{ env.build_config }} ${{ env.platform }} \
           ${{ env.archive }} ${{ env.app_version }} \
           ${{ env.archive_path }} ${{ inputs.maps}} 
+          
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
 
     name: Create Release
     needs: build-app
     
+    defaults:
+      run:
+        working-directory: ${{ env.archive_path }} 
+
     env: 
       ArchiveName: NCarApp_${{ github.run_number }}.zip
     
@@ -88,7 +93,7 @@ jobs:
       - name: Zip archive
         run: |
           echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}'
-          zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}
+          zip -rqu ${{env.ArchiveName}} .
 
       - name: Create release
         id: create_release
