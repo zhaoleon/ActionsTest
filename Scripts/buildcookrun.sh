@@ -30,6 +30,12 @@ command="$runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$buildCon
 echo -e "buildcookrun commandline is:\n"$command
 sh -c "$command"
 
+# Check archive path exist
+if [ ! -d "$archivePath" ]; then
+	echo "Error: Package failed, archive is not exist"
+	exit 2
+fi
+
 # Rename the archive to add the version number
 for dir in $archivePath*
 do

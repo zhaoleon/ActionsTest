@@ -39,9 +39,8 @@ on:
         required: false
       archive:
         description: 'Whether to archive'
-        type: boolean
         required: false
-        default: true
+        default: 'true'
       archive_path:
         description: 'Archive Path'
         required: false
@@ -52,7 +51,7 @@ env:
   environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
-  archive: ${{ inputs.archive && true }}
+  archive: ${{ inputs.archive != '' && 'false' || 'true' }}
   archive_path: ${{ inputs.archive_path != '' && '$HOME/ActionsOutput/' || '$HOME/ActionsOutput/' }}
 
 run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }}
