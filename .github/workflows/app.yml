@@ -44,7 +44,7 @@ on:
       archive_path:
         description: 'Archive Path'
         required: false
-        default: '$HOME/ActionsOutput/'
+        default: '/home/ubuntu/ActionsOutput/'
 
 env: 
   app_version: ${{ inputs.app_version !='' && '0.1.2400.1' || '0.1.2400.1' }}
@@ -52,7 +52,7 @@ env:
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
   archive: ${{ inputs.archive != '' && 'false' || 'true' }}
-  archive_path: ${{ inputs.archive_path != '' && '$HOME/ActionsOutput/' || '$HOME/ActionsOutput/' }}
+  archive_path: ${{ inputs.archive_path != '' && '/home/ubuntu/ActionsOutput/' || '/home/ubuntu/ActionsOutput/' }}
 
 run-name: App build | ${{ vars.app_version }} | ${{ vars.environment }} | ${{ vars.env.app_version }} | ${{ vars.env.environment }}
 
@@ -75,7 +75,7 @@ jobs:
           ${{ env.build_config }} ${{ env.platform }} \
           ${{ env.archive }} ${{ env.app_version }} \
           ${{ env.archive_path }} ${{ inputs.maps}} 
-          
+
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
 
