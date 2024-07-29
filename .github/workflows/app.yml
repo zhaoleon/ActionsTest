@@ -84,7 +84,7 @@ jobs:
               sha: context.sha
             })
 
-      - uses: zhaoleon/ActionsTest/.github/workflows/buildcook.yml
+      - uses: ./.github/workflows/buildcook.yml
         with:
           app_version: ${{ env.app_version }} 
           environment: ${{ env.environment }} 
