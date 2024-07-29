@@ -64,9 +64,9 @@ jobs:
     steps:
       # Clean the workspace by deleting the old version
       - run: |
-          echo 'Deleting existing workspace: ${{ github.workspace }}'
+          echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
-          
+
   build-app:
     runs-on: [self-hosted, CICDForUnreal, Linux]
     needs: clean-workspace
@@ -90,7 +90,8 @@ jobs:
               sha: context.sha
             })
 
-      - uses: ./.github/workflows/buildcook.yml
+      - name: Build cook package
+        uses: ./.github/workflows/buildcook.yml
         with:
           app_version: ${{ env.app_version }} 
           environment: ${{ env.environment }} 
