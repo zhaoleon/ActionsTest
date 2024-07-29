@@ -1,0 +1,74 @@
+name: 'NCar-Unreal-Builder'
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'The version of the app to be built'
+        required: true
+        default: '0.1'
+      environment:
+        description: 'The deployment environment'
+        required: true
+        type: choice
+        options:
+          - 'DEV'
+          - 'UAT'
+          - 'PROD'
+        default: 'DEV'
+      build_config:
+        description: 'Configuration to use'
+        type: choice
+        required: true
+        options:
+          - 'Development'
+          - 'Debug'
+          - 'Shipping'
+        default: 'Development'
+      platform:
+        description: 'Platform to build for'
+        type: choice
+        required: false
+        options:
+          - 'Win64'
+          - 'Linux'
+        default: 'Linux'
+      maps:
+        description: 'Maps to be packaged'
+        required: false
+      archive:
+        description: 'Whether to archive'
+        required: false
+        default: 'true'
+      archive_path:
+        description: 'Archive Path'
+        required: false
+        default: '/home/ubuntu/ActionsOutput/'
+
+env: 
+  app_version: ${{ inputs.app_version !='' && '0.1' || '0.1' }}
+  tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || '' }}
+  environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
+  build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
+  platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
+  archive: ${{ inputs.archive != '' && 'false' || 'true' }}
+  archive_path: ${{ inputs.archive_path != '' && '/home/ubuntu/ActionsOutput/' || '/home/ubuntu/ActionsOutput/' }}
+
+run-name: App build 
+
+jobs:
+  build-app:
+    runs-on: [self-hosted, CICDForUnreal, Linux]
+      
+    steps:
+      # Clean the workspace by deleting the old version
+      - run: |
+          echo 'Tag is: ${{ env.tag }}'
+          echo 'Deleting existing workspace: ${{ github.workspace }}'
+          rm -rf ${{ github.workspace }}/*
+
+
+
+
+

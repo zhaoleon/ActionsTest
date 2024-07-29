@@ -1,0 +1,51 @@
+name: Build cook unreal package
+
+on: 
+  workflow-call:
+    inputs:
+      app_version:
+        description: 'The version of the app to be built'
+        required: true
+        default: 'v0.1'
+      environment:
+        description: 'The deployment environment'
+        required: true
+        type: choice
+        options:
+          - 'DEV'
+          - 'UAT'
+          - 'PROD'
+        default: 'DEV'
+      build_config:
+        description: 'Configuration to use'
+        type: choice
+        required: true
+        options:
+          - 'Development'
+          - 'Debug'
+          - 'Shipping'
+        default: 'Development'
+      platform:
+        description: 'Platform to build for'
+        type: choice
+        required: false
+        options:
+          - 'Win64'
+          - 'Linux'
+        default: 'Linux'
+      maps:
+        description: 'Maps to be packaged'
+        required: false
+      archive:
+        description: 'Whether to archive'
+        required: false
+        default: 'true'
+      archive_path:
+        description: 'Archive Path'
+        required: false
+        default: '/home/ubuntu/ActionsOutput/'
+    
+    secrets: inherit
+
+    jobs:
+      

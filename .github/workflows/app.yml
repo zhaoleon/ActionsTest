@@ -1,13 +1,13 @@
 name: 'NCar-Unreal-Builder'
 
 on:
-  push:
+  #push:
   workflow_dispatch:
     inputs:
       app_version:
         description: 'The version of the app to be built'
         required: true
-        default: '0.1.2400.1'
+        default: '0.1'
       environment:
         description: 'The deployment environment'
         required: true
@@ -47,7 +47,8 @@ on:
         default: '/home/ubuntu/ActionsOutput/'
 
 env: 
-  app_version: ${{ inputs.app_version !='' && '0.1.2400.1' || '0.1.2400.1' }}
+  app_version: ${{ inputs.app_version !='' && '0.1' || '0.1' }}
+  tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || inputs.app_version }}
   environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
