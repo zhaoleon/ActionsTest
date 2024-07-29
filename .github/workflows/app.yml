@@ -84,7 +84,7 @@ jobs:
               sha: context.sha
             })
 
-      - uses: ./github/actions/buildcook.yml
+      - uses: ./.github/actions/buildcook.yml
         with:
           app_version: ${{ env.app_version }} 
           environment: ${{ env.environment }} 
