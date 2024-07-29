@@ -56,9 +56,9 @@ env:
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
   archive: ${{ inputs.archive && false || true }}
-  archive_path: '${{ github.workspace }}/Output'
+  archive_path: '${{ github.workspace }}/Output/'
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
-  # archive_path: ${{ inputs.archive_path != '' && '/home/ubuntu/ActionsOutput/' || '/home/ubuntu/ActionsOutput/' }}
+  publish_release: false
 
 jobs:
   clean-workspace:
@@ -96,9 +96,21 @@ jobs:
           archive: ${{ env.archive }} 
           archive_path: ${{ env.archive_path }}
 
+      - name: Check if publish release
+        run: |
+          ${{ env.publish_release }}=${{ startsWith(env.tag, 'v') }}
+          echo 'Build: App version starts with v, so it will publish to release'
+
+      - name: Check if publish release on push
+        if: startsWith(github.ref, 'refs/tags') && startsWith(github.env.tag, 'v')
+        run: |
+          ${{ env.publish_release }}=true
+          echo 'Build: Pushed tag starts with v, so it will publish to release'
+
+
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    if: startsWith(github.ref, 'refs/tags') && startsWith(github.env.tag, 'v') || startsWith(github.env.tag, 'v')
+    if: ${{ github.env.publish_release }}
 
     permissions:
       contents: write
