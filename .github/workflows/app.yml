@@ -1,5 +1,7 @@
 name: 'NCar-Unreal-Builder'
 
+run-name: App build 
+
 on:
   push:
   workflow_dispatch:
@@ -55,8 +57,6 @@ env:
   archive: ${{ inputs.archive != '' && 'false' || 'true' }}
   archive_path: ${{ inputs.archive_path != '' && '/home/ubuntu/ActionsOutput/' || '/home/ubuntu/ActionsOutput/' }}
 
-run-name: App build 
-
 jobs:
   clean-workspace:
     runs-on: [self-hosted, CICDForUnreal, Linux]
@@ -78,20 +78,8 @@ jobs:
           fetch-depth: 0
           repository: ${{ github.repository }}
 
-      - name: Create tag
-        if: ${{ env.tag }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ env.tag }}',
-              sha: context.sha
-            })
-
       - name: Build cook package
-        uses: ./.github/workflows/buildcook.yml
+        uses: ./.github/actions/buildcook
         with:
           app_version: ${{ env.app_version }} 
           environment: ${{ env.environment }} 
@@ -127,6 +115,42 @@ jobs:
       ArchiveName: NCarApp_${{ github.run_number }}.zip
     
     steps:
+      - name: Get repo tags
+        id: get-tags
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {data} = await github.rest.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const formattedTags = data.map(tag => tag.name);
+            return formattedTags;
+
+      - name: Output tags
+        run: |
+          echo 'Existing tags: ${{ steps.get-tags.outputs.result }}'
+
+      - name: Check tag availability
+        id: check-tag
+        if: ${{ startsWith(env.tag, 'v') && contains(steps.get-tags.outputs.result, env.tag) }}
+        run: |
+          echo '::error::Error: Version ${{ env.tag }} already exists, please reset it with a new one'
+              
+      - name: Create tag
+        id: create-tag
+        if: 
+          ${{ startsWith(env.tag, 'v') && !contains(steps.get-tags.outputs.result, env.tag)}}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ env.tag }}',
+              sha: context.sha
+            })
+
       - name: Zip archive
         run: |
           echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}'
@@ -157,7 +181,3 @@ jobs:
           asset_path: ${{env.archive_path}}/${{env.ArchiveName}}
           asset_name: ${{env.ArchiveName}}
           asset_content_type: application/zip
-
-
-
-

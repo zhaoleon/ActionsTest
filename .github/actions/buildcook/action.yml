@@ -1,0 +1,87 @@
+name: Build cook unreal package
+
+inputs:
+  app_version:
+    description: 'The version of the app to be built'
+    type: string
+    required: true
+    default: 'v0.1'
+  environment:
+    description: 'The deployment environment'
+    required: true
+    type: string
+    default: 'DEV'
+  build_config:
+    description: 'Configuration to use'
+    type: string
+    required: true
+    default: 'Development'
+  platform:
+    description: 'Platform to build for'
+    type: string
+    required: false
+    default: 'Linux'
+  maps:
+    description: 'Maps to be packaged'
+    type: string
+    required: false
+  archive:
+    description: 'Whether to archive'
+    type: string
+    required: false
+    default: 'true'
+  archive_path:
+    description: 'Archive Path'
+    type: string
+    required: false
+    default: '/home/ubuntu/ActionsOutput/'
+    
+env:
+  m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
+  m_buildConfig: ${{ inputs.build_config }} #"Development"
+  m_platform: ${{ inputs.platform }} #"linux"
+  m_archive: ${{ inputs.archive }} #"true"
+  m_app_version: ${{ inputs.app_version }}
+  m_archivePath: ${{ inputs.archive_path }}
+  m_maps: ${{ inputs.maps }} #"false"
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Build cook and package unreal project
+      run: |
+        if [ "${m_archivePath:-1}"!="/"];then
+          m_archivePath="$m_archivePath/"
+        fi
+
+        # Make sure there is only one uproject file in the project.
+        uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+        if [ "$uprojectCount" != 1 ]; then
+          echo "Error: $uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
+          exit 1
+        fi
+
+        # Search for *.uproject file in the upper folder and change the relative path into absolute
+        uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
+
+        archiveArg=$( [ "$m_archive" = 'true' ] && echo "-archive -archivedirectory=$m_archivePath" )
+        mapsArg=$( [ "$m_maps" = 'true' ] && echo "" || echo "-map=$m_maps" )
+
+        command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$m_buildConfig -platform=$m_platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+
+        echo -e "buildcookrun commandline is:\n"$command
+        sh -c "$command"
+
+            # Check archive path exist
+            if [ ! -d "$m_archivePath" ]; then
+              echo "Error: Package failed, archive is not exist"
+              exit 2
+            fi
+
+          # Rename the archive to add the version number
+          for dir in $m_archivePath*
+          do
+            new_name=$dir"_"$m_app_version
+            mv "$dir" "$new_name"
+          done
