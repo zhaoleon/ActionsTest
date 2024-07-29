@@ -77,7 +77,7 @@ runs:
           archiveArg=""
         fi
 
-        #archiveArg=$( [ "${{ ${{ inputs.maps }}}}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
+        #archiveArg=$( [ "${{ ${{ inputs.maps }}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
         if [[ -n "$m_maps" ]]; then
           mapsArg="-map=${{ inputs.maps }}"
         else
