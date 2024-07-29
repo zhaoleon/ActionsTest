@@ -48,7 +48,7 @@ on:
 
 env: 
   app_version: ${{ inputs.app_version !='' && '0.1' || '0.1' }}
-  tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || '' }}
+  tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') && inputs.app_version || '' }}
   environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
