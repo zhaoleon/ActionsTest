@@ -84,11 +84,21 @@ jobs:
               sha: context.sha
             })
 
-      - run: |
-          Scripts/buildcookrun.sh \
-          ${{ env.build_config }} ${{ env.platform }} \
-          ${{ env.archive }} ${{ env.app_version }} \
-          ${{ env.archive_path }} ${{ inputs.maps}} 
+      - uses: ./github/actions/buildcook.yml
+        with:
+          app_version: ${{ env.app_version }} 
+          environment: ${{ env.environment }} 
+          build_config: ${{ env.build_config }} 
+          platform: ${{ env.platform }} 
+          maps: ${{ inputs.maps}} 
+          archive: ${{ env.archive }} 
+          archive_path: ${{ env.archive_path }}
+
+      # - run: |
+      #     Scripts/buildcookrun.sh \
+      #     ${{ env.build_config }} ${{ env.platform }} \
+      #     ${{ env.archive }} ${{ env.app_version }} \
+      #     ${{ env.archive_path }} ${{ inputs.maps}} 
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
