@@ -68,7 +68,17 @@ jobs:
           echo 'Deleting existing workspace: ${{ github.workspace }}'
           rm -rf ${{ github.workspace }}/*
 
-
+      - name: Create tag
+        if: ${{ env.tag }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ env.tag }}',
+              sha: context.sha
+            })
 
 
 
