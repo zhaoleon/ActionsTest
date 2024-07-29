@@ -55,9 +55,9 @@ env:
   environment: ${{ inputs.environment != '' && 'DEV' || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && 'Development' || 'Development' }} 
   platform: ${{ inputs.platform !='' && 'Linux' || 'Linux' }} 
-  archive: ${{ inputs.archive }}
+  archive: ${{ inputs.archive && false || true }}
   archive_path: '${{ github.workspace }}/Output'
-  maps: ${{ inputs.maps }}
+  maps: ${{ inputs.maps !='' && inputs.maps || '' }}
   # archive_path: ${{ inputs.archive_path != '' && '/home/ubuntu/ActionsOutput/' || '/home/ubuntu/ActionsOutput/' }}
 
 jobs:
