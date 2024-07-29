@@ -1,8 +1,8 @@
 name: 'NCar-Unreal-Builder'
 
 on:
-  push:
-  workflow_dispatch:
+  #push:
+  #workflow_dispatch:
     inputs:
       app_version:
         description: 'The version of the app to be built'
