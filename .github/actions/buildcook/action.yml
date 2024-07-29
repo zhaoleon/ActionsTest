@@ -70,14 +70,14 @@ runs:
         # Search for *.uproject file in the upper folder and change the relative path into absolute
         uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-        if [[ ${{ inputs.archive }} = true]]; then
+        if [[ $m_archive = true ]]; then
           archiveArg="-archive -archivedirectory=${{ inputs.archive_path }}"
         else
           archiveArg=""
         fi
 
-        #archiveArg=$( [ "${{ inputs.archive }}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
-        if [[ -n "${{ inputs.maps }}" ]]; then
+        #archiveArg=$( [ "${{ ${{ inputs.maps }}}}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
+        if [[ -n "$m_maps" ]]; then
           mapsArg="-map=${{ inputs.maps }}"
         else
           mapsArg=""
