@@ -52,9 +52,9 @@ runs:
         m_app_version: ${{ inputs.app_version }}
         m_archivePath: ${{ inputs.archive_path }}
         m_maps: ${{ inputs.maps }} #"false"
-        
+
       run: |
-        echo 'Project path on runner is: '${{ github.workspace }}
+        echo 'Project path on runner is: '$github.workspace
 
         if [ "${m_archivePath:-1}"!="/"];then
           m_archivePath="${{ inputs.archive_path }}/"
