@@ -60,6 +60,7 @@ env:
 
 jobs:
   clean-workspace:
+    name: Clean the workflow workspace
     runs-on: [self-hosted, CICDForUnreal, Linux]
 
     steps:
@@ -102,7 +103,7 @@ jobs:
       pull-requests: write
       repository-projects: write
 
-    name: Create Release
+    name: Create release
     needs: build-app
     
     defaults:
