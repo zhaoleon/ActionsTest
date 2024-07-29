@@ -56,33 +56,33 @@ env:
   m_archivePath: ${{ inputs.archive_path }}
   m_maps: ${{ inputs.mpas }} #"false"
 
-    jobs:
-      buildcookrun:
-        runs-on: [self-hosted, CICDForUnreal, Linux]
+jobs:
+  buildcookrun:
+    runs-on: [self-hosted, CICDForUnreal, Linux]
 
-        steps:
-          - run: |
-            if [ "${m_archivePath:-1}"!="/"];then
-              m_archivePath="$m_archivePath/"
-            fi
+    steps:
+      - run: |
+        if [ "${m_archivePath:-1}"!="/"];then
+          m_archivePath="$m_archivePath/"
+        fi
 
-            # Make sure there is only one uproject file in the project.
-            uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
-            if [ "$uprojectCount" != 1 ]; then
-              echo "Error: $uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
-              exit 1
-            fi
+        # Make sure there is only one uproject file in the project.
+        uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+        if [ "$uprojectCount" != 1 ]; then
+          echo "Error: $uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
+          exit 1
+        fi
 
-            # Search for *.uproject file in the upper folder and change the relative path into absolute
-            uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
+        # Search for *.uproject file in the upper folder and change the relative path into absolute
+        uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-            archiveArg=$( [ "$m_archive" = 'true' ] && echo "-archive -archivedirectory=$m_archivePath" )
-            mapsArg=$( [ "$m_maps" = 'true' ] && echo "" || echo "-map=$m_maps" )
+        archiveArg=$( [ "$m_archive" = 'true' ] && echo "-archive -archivedirectory=$m_archivePath" )
+        mapsArg=$( [ "$m_maps" = 'true' ] && echo "" || echo "-map=$m_maps" )
 
-            command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$m_buildConfig -platform=$m_platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+        command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$m_buildConfig -platform=$m_platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
 
-            echo -e "buildcookrun commandline is:\n"$command
-            sh -c "$command"
+        echo -e "buildcookrun commandline is:\n"$command
+        sh -c "$command"
 
             # Check archive path exist
             if [ ! -d "$m_archivePath" ]; then
