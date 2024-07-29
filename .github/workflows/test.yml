@@ -70,14 +70,24 @@ jobs:
 
       - name: Check tag
         id: check-tag
-        if: ${{ env.tag && contains(github.ref, env.tag)}}
-        run:
-          echo '::error::Tag already exists'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tags = await github.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const formattedTags = tags.data.map(tag => tag.name);
+            return formattedTags;
 
+      - name: Output tags
+        run: |
+            echo 'Existing tags: ${{ steps.check-tag.outputs.result }}'
+        
       - name: Create tag
         id: create-tag
         if: 
-          ${{ env.tag && !contains(github.ref, env.tag)}}
+          ${{ env.tag && !contains(steps.check-tag.outputs.result, env.tag)}}
         uses: actions/github-script@v7
         with:
           script: |
