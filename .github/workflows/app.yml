@@ -98,7 +98,7 @@ jobs:
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    if: ${{ startsWith(github.ref, 'refs/tags') && startsWith(github.env.tag, 'v') }}
+    if: startsWith(github.ref, 'refs/tags') && startsWith(github.env.tag, 'v') || startsWith(github.env.tag, 'v')
 
     permissions:
       contents: write
