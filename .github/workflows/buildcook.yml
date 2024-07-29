@@ -1,60 +1,51 @@
 name: Build cook unreal package
 
 on: 
-  workflow-call:
+  workflow_call:
     inputs:
       app_version:
         description: 'The version of the app to be built'
+        type: string
         required: true
         default: 'v0.1'
       environment:
         description: 'The deployment environment'
         required: true
-        type: choice
-        options:
-          - 'DEV'
-          - 'UAT'
-          - 'PROD'
+        type: string
         default: 'DEV'
       build_config:
         description: 'Configuration to use'
-        type: choice
+        type: string
         required: true
-        options:
-          - 'Development'
-          - 'Debug'
-          - 'Shipping'
         default: 'Development'
       platform:
         description: 'Platform to build for'
-        type: choice
+        type: string
         required: false
-        options:
-          - 'Win64'
-          - 'Linux'
         default: 'Linux'
       maps:
         description: 'Maps to be packaged'
+        type: string
         required: false
       archive:
         description: 'Whether to archive'
+        type: string
         required: false
         default: 'true'
       archive_path:
         description: 'Archive Path'
+        type: string
         required: false
         default: '/home/ubuntu/ActionsOutput/'
     
-    secrets: inherit
-
 env:
   m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
   m_buildConfig: ${{ inputs.build_config }} #"Development"
   m_platform: ${{ inputs.platform }} #"linux"
   m_archive: ${{ inputs.archive }} #"true"
-  m_app_version: ${{ inputs.app_version:-"0.1"}}
+  m_app_version: ${{ inputs.app_version }}
   m_archivePath: ${{ inputs.archive_path }}
-  m_maps: ${{ inputs.mpas }} #"false"
+  m_maps: ${{ inputs.maps }} #"false"
 
 jobs:
   buildcookrun:
@@ -62,33 +53,33 @@ jobs:
 
     steps:
       - run: |
-        if [ "${m_archivePath:-1}"!="/"];then
-          m_archivePath="$m_archivePath/"
-        fi
+          if [ "${m_archivePath:-1}"!="/"];then
+            m_archivePath="$m_archivePath/"
+          fi
 
-        # Make sure there is only one uproject file in the project.
-        uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
-        if [ "$uprojectCount" != 1 ]; then
-          echo "Error: $uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
-          exit 1
-        fi
+          # Make sure there is only one uproject file in the project.
+          uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+          if [ "$uprojectCount" != 1 ]; then
+            echo "Error: $uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
+            exit 1
+          fi
 
-        # Search for *.uproject file in the upper folder and change the relative path into absolute
-        uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
+          # Search for *.uproject file in the upper folder and change the relative path into absolute
+          uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-        archiveArg=$( [ "$m_archive" = 'true' ] && echo "-archive -archivedirectory=$m_archivePath" )
-        mapsArg=$( [ "$m_maps" = 'true' ] && echo "" || echo "-map=$m_maps" )
+          archiveArg=$( [ "$m_archive" = 'true' ] && echo "-archive -archivedirectory=$m_archivePath" )
+          mapsArg=$( [ "$m_maps" = 'true' ] && echo "" || echo "-map=$m_maps" )
 
-        command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$m_buildConfig -platform=$m_platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+          command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=$m_buildConfig -platform=$m_platform $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
 
-        echo -e "buildcookrun commandline is:\n"$command
-        sh -c "$command"
+          echo -e "buildcookrun commandline is:\n"$command
+          sh -c "$command"
 
-            # Check archive path exist
-            if [ ! -d "$m_archivePath" ]; then
-              echo "Error: Package failed, archive is not exist"
-              exit 2
-            fi
+              # Check archive path exist
+              if [ ! -d "$m_archivePath" ]; then
+                echo "Error: Package failed, archive is not exist"
+                exit 2
+              fi
 
             # Rename the archive to add the version number
             for dir in $m_archivePath*
