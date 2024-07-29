@@ -155,9 +155,11 @@ jobs:
       - name: Check tag availability
         id: check-tag
         run: |
-          if [ contains(steps.get-tags.outputs.result, env.app_version) ]; then
+          tags=${{ steps.get-tags.outputs.result }}
+          item=${{ env.app_version }}
+          if [ "${tags[@]}" =~ "$item" ]; then
             echo '::error::Error: Version ${{ env.app_version }} already exists, please reset it with a new one'
-            exit 1
+            exit 4
           fi
               
       - name: Create tag
