@@ -25,6 +25,7 @@ inputs:
     description: 'Maps to be packaged'
     type: string
     required: false
+    default: ''
   archive:
     description: 'Whether to archive'
     type: boolean
