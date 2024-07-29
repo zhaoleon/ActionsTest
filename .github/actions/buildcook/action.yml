@@ -78,12 +78,11 @@ runs:
           archiveArg=""
         fi
 
-        #archiveArg=$( [ "${{ ${{ inputs.maps }}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
-        if [[ -n "$m_maps" ]]; then
-          mapsArg="-map=${{ env.maps }}"
-        else
-          mapsArg=""
-        fi
+        # if [[ -n "$m_maps" ]]; then
+        #   mapsArg="-map=${{ env.m_maps }}"
+        # else
+        #   mapsArg=""
+        # fi
 
         command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=${{ inputs.build_config }} -platform=${{ inputs.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
 
