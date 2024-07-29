@@ -52,6 +52,7 @@ runs:
         m_app_version: ${{ inputs.app_version }}
         m_archivePath: ${{ inputs.archive_path }}
         m_maps: ${{ inputs.maps }} #"false"
+        
       run: |
         echo 'Project path on runner is: '${{ github.workspace }}
 
