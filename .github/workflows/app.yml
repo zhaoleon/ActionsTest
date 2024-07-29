@@ -98,13 +98,13 @@ jobs:
 
       - name: Check if publish release
         run: |
-          ${{ env.publish_release }}=${{ env.tag }}
+          echo "publish_release=true" >> $GITHUB_ENV
           echo 'Build: App version starts with v, so it will publish to release'
 
       - name: Check if publish release on push
         if: ${{ startsWith(github.ref, 'refs/tags') }}
         run: |
-          ${{ env.publish_release }}=true
+          echo "publish_release=true" >> $GITHUB_ENV
           echo 'Build: Pushed tag starts with v, so it will publish to release'
 
 
