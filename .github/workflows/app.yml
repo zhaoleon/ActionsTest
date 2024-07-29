@@ -42,7 +42,7 @@ on:
       archive:
         description: 'Whether to archive'
         type: boolean
-        required: false
+        required: true
         default: true
       # archive_path:
       #   description: 'Archive Path'
