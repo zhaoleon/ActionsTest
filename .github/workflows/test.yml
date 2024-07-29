@@ -73,11 +73,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const tags = await github.repos.listTags({
+            const {data} = await github.repos.listTags({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            const formattedTags = tags.data.map(tag => tag.name);
+            const formattedTags = data.map(tag => tag.name);
             return formattedTags;
 
       - name: Output tags
