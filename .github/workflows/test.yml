@@ -68,8 +68,8 @@ jobs:
           echo 'Deleting existing workspace: ${{ github.workspace }}'
           rm -rf ${{ github.workspace }}/*
 
-      - name: Check tag
-        id: check-tag
+      - name: Get tags
+        id: get-tags
         uses: actions/github-script@v7
         with:
           script: |
@@ -80,14 +80,20 @@ jobs:
             const formattedTags = data.map(tag => tag.name);
             return formattedTags;
 
+      - name: Check tag
+        id: check-tag
+        if: ${{ contains(steps.get-tags.outputs.result, env.tag) }}
+        run: |
+          echo '::error::Error: Version ${{ env.tag }} already exists, please reset it with a new one'
+        
       - name: Output tags
         run: |
-            echo 'Existing tags: ${{ steps.check-tag.outputs.result }}'
+          echo 'Existing tags: ${{ steps.get-tags.outputs.result }}'
         
       - name: Create tag
         id: create-tag
         if: 
-          ${{ env.tag && !contains(steps.check-tag.outputs.result, env.tag)}}
+          ${{ env.tag && !contains(steps.get-tags.outputs.result, env.tag)}}
         uses: actions/github-script@v7
         with:
           script: |
