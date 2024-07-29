@@ -54,7 +54,7 @@ runs:
         m_maps: ${{ inputs.maps }} #"false"
 
       run: |
-        echo 'Project path on runner is: '$github.workspace
+        echo 'Project path on runner is: '${{ github.workspace }}
 
         if [ "${m_archivePath:-1}"!="/"];then
           m_archivePath="${{ inputs.archive_path }}/"
@@ -80,7 +80,7 @@ runs:
 
         #archiveArg=$( [ "${{ ${{ inputs.maps }}" == true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || "")
         if [[ -n "$m_maps" ]]; then
-          mapsArg="-map=${{ inputs.maps }}"
+          mapsArg="-map=${{ env.maps }}"
         else
           mapsArg=""
         fi
