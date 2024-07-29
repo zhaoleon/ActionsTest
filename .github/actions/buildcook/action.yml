@@ -72,7 +72,7 @@ runs:
         # Search for *.uproject file in the upper folder and change the relative path into absolute
         uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-        if [[ ${{ env.m_archive }} ]]; then
+        if ${{ env.m_archive }}; then
           archiveArg="-archive -archivedirectory=${{ inputs.archive_path }}"
         else
           archiveArg=""
