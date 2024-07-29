@@ -70,7 +70,7 @@ runs:
         # Search for *.uproject file in the upper folder and change the relative path into absolute
         uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-        archiveArg=$( [ "${{ inputs.archive }}" = true ] && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || echo "")
+        archiveArg=$(${{ inputs.archive }} && echo "-archive -archivedirectory=${{ inputs.archive_path }}" || echo "")
         mapsArg=$( [ "${{ inputs.maps }}" = 'true' ] && echo "" || echo "-map=${{ inputs.maps }}" )
 
         command="$m_runUatPath BuildCookRun -project=$uprojectPath -clientconfig=${{ inputs.build_config }} -platform=${{ inputs.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
