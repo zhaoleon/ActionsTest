@@ -41,6 +41,8 @@ runs:
 
   steps:
     - name: Build cook and package unreal project
+      shell: bash
+      
       env: 
         m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
         m_buildConfig: ${{ inputs.build_config }} #"Development"

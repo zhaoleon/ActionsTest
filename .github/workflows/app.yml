@@ -63,16 +63,19 @@ jobs:
 
     steps:
       # Clean the workspace by deleting the old version
-      - run: |
+      - name: Clean workspace
+        run: |
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
 
   build-app:
+    name: Build unreal project
     runs-on: [self-hosted, CICDForUnreal, Linux]
     needs: clean-workspace
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout project
+        uses: actions/checkout@v4
         with: 
           lfs: true
           fetch-depth: 0
