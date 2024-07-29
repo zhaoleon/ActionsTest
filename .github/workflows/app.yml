@@ -71,6 +71,7 @@ jobs:
         with: 
           lfs: true
           fetch-depth: 0
+          repository: ${{ github.repository }}
 
       - name: Create tag
         if: ${{ env.tag }}
@@ -84,7 +85,7 @@ jobs:
               sha: context.sha
             })
 
-      - uses: ./.github/workflows/action.yml
+      - uses: ./.github/workflows/buildcook.yml
         with:
           app_version: ${{ env.app_version }} 
           environment: ${{ env.environment }} 
