@@ -2,6 +2,10 @@ name: 'NCar-Unreal-Builder'
 
 run-name: App build 
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 on:
   push:
   workflow_dispatch:
@@ -67,7 +71,6 @@ jobs:
     steps:
       # Clean the workspace by deleting the old version
       - name: Clean workspace
-        if: ${{ github.event. }}
         run: |
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
