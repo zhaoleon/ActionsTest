@@ -98,6 +98,6 @@ runs:
           # Rename the archive to add the version number
           for dir in ${{ inputs.archive_path }}*
           do
-            new_name=$dir"_"${{ inputs.app_version }}
+            new_name=$dir""NCar${{ inputs.app_version }}.${{ github.run_number }}
             mv "$dir" "$new_name"
           done

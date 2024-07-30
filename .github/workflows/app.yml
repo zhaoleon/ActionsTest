@@ -67,6 +67,7 @@ jobs:
     steps:
       # Clean the workspace by deleting the old version
       - name: Clean workspace
+        if: ${{ github.event. }}
         run: |
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
@@ -134,7 +135,6 @@ jobs:
 
     env: 
       archive-name: NCarApp${{ github.env.app_version }}.${{ github.run_number }}.zip
-      branch-name: ${{ github.head_ref || github.ref_name }}
     
     steps:
       - name: Zip archive
@@ -147,8 +147,7 @@ jobs:
         run: |
           if [ -e ${{ env.archive-name }} ]; then
             echo "Create release: Creating release"
-            echo "Create release: Current branch name is: "${{ env.branch-name }}
-            gh release create ${{ env.app_version }} ${{ env.archive_path }}${{env.archive-name}} --generate-notes -t 'Release ${{ env.app_version }}' --target ${{ env.branch-name }}
+            gh release create ${{ env.app_version }} ${{ env.archive_path }}${{env.archive-name}} --generate-notes -t 'Release ${{ env.app_version }}'
           else
             echo "::error::Create release: Zip file doesn't exists"
           fi
