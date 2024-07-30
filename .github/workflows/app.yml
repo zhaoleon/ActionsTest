@@ -2,8 +2,8 @@ name: 'NCar-Unreal-Builder'
 
 run-name: App build 
 
-concurrency:
-  group: ${{ github.workflow }}
+# concurrency:
+#   group: ${{ github.workflow }}
 
 on:
   push:
