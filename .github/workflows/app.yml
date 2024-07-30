@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       app_version:
-        description: 'The version of the app to be built'
+        description: 'The version of the app to be built, if empty it would be workflow run number'
         required: true
-        default: '0.1'
+        default: ''
       environment:
         description: 'The deployment environment'
         required: true
@@ -50,7 +50,7 @@ on:
       #   default: '/home/ubuntu/ActionsOutput/'
 
 env: 
-  app_version: ${{ inputs.app_version !='' && inputs.app_version || '0.1' }}
+  app_version: ${{ inputs.app_version !='' && inputs.app_version || github.run_number }}
   tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || false }}
   environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
@@ -118,7 +118,7 @@ jobs:
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    if: ${{ needs.build-app.outputs.dispatch_release }} || ${{ needs.build-app.outputs.push_release }}
+    #if: ${{ needs.build-app.outputs.dispatch_release }} || ${{ needs.build-app.outputs.push_release }}
 
     permissions:
       contents: write
@@ -133,49 +133,9 @@ jobs:
         working-directory: ${{ env.archive_path }} 
 
     env: 
-      ArchiveName: NCarApp_${{ github.run_number }}.zip
+      ArchiveName: NCarApp${{ github.env.app_version }}.${{ github.run_number }}.zip
     
     steps:
-      - name: Get repo tags
-        id: get-tags
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const {data} = await github.rest.repos.listTags({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            const formattedTags = data.map(tag => tag.name);
-            return formattedTags;
-
-      - name: Output tags
-        run: |
-          echo 'Existing tags: ${{ steps.get-tags.outputs.result }}'
-
-      - name: Check tag availability
-        id: check-tag
-        run: |
-          tags=${{ steps.get-tags.outputs.result }}
-          item=${{ env.app_version }}
-          if [ "${tags[@]}" =~ "$item" ]; then
-            echo '::error::Error: Version ${{ env.app_version }} already exists, please reset it with a new one'
-            exit 4
-          fi
-              
-      - name: Create tag
-        id: create-tag
-        if: 
-          ${{ env.tag }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ env.app_version }}',
-              sha: context.sha
-            })
-
       - name: Zip archive
         run: |
           echo 'zip command: zip -rqu ${{env.ArchiveName}} ${{ env.archive_path }}'
@@ -183,24 +143,5 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
-          tag_name: ${{ env.app_version }}
-          release_name: Release ${{ github.ref }}.${{ github.run_number }}
-          body: |
-            Release: ${{ env.app_version }}
-          draft: false
-          prerelease: false
-          
-      - name: Upload release asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ${{env.archive_path}}/${{env.ArchiveName}}
-          asset_name: ${{env.ArchiveName}}
-          asset_content_type: application/zip
+        run: |
+          gh release create ${{ env.app_version }} ${{ env.archive_path }}/${{env.ArchiveName}} --generate-notes
