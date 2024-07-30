@@ -144,4 +144,4 @@ jobs:
       - name: Create release
         id: create_release
         run: |
-          gh release create ${{ env.app_version }} ${{ env.archive_path }}/${{env.ArchiveName}} --generate-notes
+          gh release create 'Release ${{ env.app_version }}' ${{ env.archive_path }}${{env.ArchiveName}} --generate-notes
