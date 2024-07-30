@@ -1,10 +1,5 @@
 name: 'NCar-Unreal-Builder'
-
 run-name: App build 
-
-# concurrency:
-#   group: ${{ github.workflow }}
-
 
 on:
   push:
@@ -80,8 +75,8 @@ jobs:
     runs-on: [self-hosted, CICDForUnreal, Linux]
     needs: clean-workspace
     outputs: 
-      dispatch_release: ${{ steps.check-if-release-dispatch.outputs.publish_release }}
-      push_release: ${{ steps.check-if-release-push.outputs.publish_release }}
+      dispatch-release: ${{ steps.check-if-release-dispatch.outputs.publish_release }}
+      push-release: ${{ steps.check-if-release-push.outputs.publish_release }}
 
     steps:
       - name: Checkout project
@@ -92,6 +87,7 @@ jobs:
           repository: ${{ github.repository }}
 
       - name: Build cook package
+        id: build-cook-package
         uses: ./.github/actions/buildcook
         with:
           app_version: ${{ env.app_version }} 
@@ -102,27 +98,15 @@ jobs:
           archive: ${{ env.archive }} 
           archive_path: ${{ env.archive_path }}
 
-      - name: Check if publish release
-        id: check-if-release-dispatch
-        run: |
-          if [ ${{ startsWith(env.app_version, 'v') }}]; then
-            echo "publish_release=true" >> $GITHUB_OUTPUT
-            echo 'Build: App version starts with v, it will publish to release'
-          else
-            echo "publish_release=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check if publish release on push
-        id: check-if-release-push
-        if: ${{ startsWith(github.ref, 'refs/tags') }}
-        run: |
-          # TODO: check the push tag starts with v
-          echo "publish_release=true" >> $GITHUB_OUTPUT
-          echo 'Build: Pushed tag starts with v, it will publish to release'
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.build-cook-package.outputs.output-path }}
+          name: NCar${{ inputs.app_version }}.${{ github.run_number }}
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    #if: ${{ needs.build-app.outputs.dispatch_release }} || ${{ needs.build-app.outputs.push_release }}
+    #if: ${{ needs.build-app.outputs.dispatch-release }} || ${{ needs.build-app.outputs.push-release }}
 
     permissions:
       contents: write
@@ -136,21 +120,26 @@ jobs:
       run:
         working-directory: ${{ env.archive_path }} 
 
-    env: 
-      archive-name: NCarApp${{ github.env.app_version }}.${{ github.run_number }}.zip
+    # env: 
+    #   archive-name: NCarApp${{ github.env.app_version }}.${{ github.run_number }}.zip
     
     steps:
-      - name: Zip archive
-        run: |
-          echo 'zip command: zip -rqu ${{env.archive-name}} ${{ env.archive_path }}'
-          zip -rqu ${{env.archive-name}} .
+      # - name: Zip archive
+      #   run: |
+      #     echo 'zip command: zip -rqu ${{env.archive-name}} ${{ env.archive_path }}'
+      #     zip -rqu ${{env.archive-name}} .
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with: 
+          path: ${{ github.workspace }}
 
       - name: Create release
         id: create_release
         run: |
-          if [ -e ${{ env.archive-name }} ]; then
+          artifact-path=${{ github.workspace }}/NCar${{ inputs.app_version }}.${{ github.run_number }}.zip
+          if [ -e $artifact-path ]; then
             echo "Create release: Creating release"
-            gh release create ${{ env.app_version }} ${{ env.archive_path }}${{env.archive-name}} --generate-notes -t 'Release ${{ env.app_version }}'
+            gh release create ${{ env.app_version }} $artifact-path --generate-notes -t 'Release ${{ env.app_version }}'
           else
             echo "::error::Create release: Zip file doesn't exists"
           fi

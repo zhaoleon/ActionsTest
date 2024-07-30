@@ -36,12 +36,18 @@ inputs:
     type: string
     required: false
     default: '/home/ubuntu/ActionsOutput/'
-    
+
+outputs:
+  output-path:
+    description: 'Unreal project output path'
+    value: ${{ steps.run-uat.outputs.output }}
+
 runs:
   using: 'composite'
 
   steps:
     - name: Build cook and package unreal project
+      id: run-uat
       shell: bash
 
       env: 
@@ -89,15 +95,16 @@ runs:
         echo -e "buildcookrun commandline is:\n"$command
         sh -c "$command"
 
-            # Check archive path exist
-            if [ ! -d "${{ inputs.archive_path }}" ]; then
-              echo "Error: Package failed, archive is not exist"
-              exit 2
-            fi
+        # Check archive path exist
+        if [ ! -d "${{ inputs.archive_path }}" ]; then
+          echo "Error: Package failed, archive is not exist"
+          exit 2
+        fi
 
-          # Rename the archive to add the version number
-          for dir in ${{ inputs.archive_path }}*
-          do
-            new_name=$dir""NCar${{ inputs.app_version }}.${{ github.run_number }}
-            mv "$dir" "$new_name"
-          done
+        # Rename the archive to add the version number
+        for dir in ${{ inputs.archive_path }}*
+        do
+          new_name=$dir""NCar${{ inputs.app_version }}.${{ github.run_number }}
+          mv "$dir" "$new_name"
+          echo "${{ inputs.archive_path }}/$new_name" >> $GITHUB_OUTPUT
+        done
