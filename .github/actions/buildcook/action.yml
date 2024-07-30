@@ -106,5 +106,5 @@ runs:
         do
           new_name=$dir""NCar${{ inputs.app_version }}.${{ github.run_number }}
           mv "$dir" "$new_name"
-          echo "${{ inputs.archive_path }}/$new_name" >> $GITHUB_OUTPUT
+          echo "$new_name" >> $GITHUB_OUTPUT
         done
