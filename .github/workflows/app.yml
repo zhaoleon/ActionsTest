@@ -102,7 +102,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ${{ steps.build-cook-package.outputs.output-path }}
-          name: NCar${{ inputs.app_version }}.${{ github.run_number }}
+          name: NCar${{ inputs.app_version }}_${{ github.run_number }}
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
