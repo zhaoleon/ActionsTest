@@ -121,15 +121,8 @@ jobs:
     defaults:
       run:
         working-directory: ${{ env.archive_path }} 
-
-    # env: 
-    #   archive-name: NCarApp${{ github.env.app_version }}.${{ github.run_number }}.zip
     
     steps:
-      # - name: Zip archive
-      #   run: |
-      #     echo 'zip command: zip -rqu ${{env.archive-name}} ${{ env.archive_path }}'
-      #     zip -rqu ${{env.archive-name}} .
       - name: Download artifact
         uses: actions/download-artifact@v4
         with: 
