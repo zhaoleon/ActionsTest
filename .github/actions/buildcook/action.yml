@@ -119,12 +119,12 @@ runs:
           zip_folder=$new_name/*
           zip -rqu $zip_name $zip_folder
 
-          echo "Build cook: Unreal build cook run completed..."
-          zip_name=$new_name_path".zip"          
+          echo "Build cook: Unreal build cook run completed..."      
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "text<<$EOF" >> $GITHUB_OUTPUT
           echo "output-path=$zip_name" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
           echo "Build cook: zip file is: "$zip_name
+          echo "::set-output name=$zip_name::$output-path2"
 
         done
