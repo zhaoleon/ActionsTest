@@ -107,5 +107,5 @@ runs:
           new_name=$dir""NCar${{ inputs.app_version }}_${{ github.run_number }}
           mv "$dir" "$new_name"
           new_name_base=$(basename $new_name)
-          echo '$new_name_base' >> $GITHUB_OUTPUT
+          echo "$new_name_base" >> $GITHUB_OUTPUT
         done
