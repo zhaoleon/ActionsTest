@@ -47,13 +47,13 @@ runs:
 
   steps:
     env: 
-        m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
-        m_buildConfig: ${{ inputs.build_config }} #"Development"
-        m_platform: ${{ inputs.platform }} #"linux"
-        m_archive: ${{ inputs.archive }} #"true"
-        m_app_version: ${{ inputs.app_version }}
-        m_archivePath: ${{ inputs.archive_path }}
-        m_maps: ${{ inputs.maps }} #"false"
+      m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
+      m_buildConfig: ${{ inputs.build_config }} #"Development"
+      m_platform: ${{ inputs.platform }} #"linux"
+      m_archive: ${{ inputs.archive }} #"true"
+      m_app_version: ${{ inputs.app_version }}
+      m_archivePath: ${{ inputs.archive_path }}
+      m_maps: ${{ inputs.maps }} #"false"
 
     - name: Build cook and package unreal project
       id: run-uat
