@@ -123,7 +123,8 @@ runs:
           zip_name="Output/"$new_name_path".zip"          
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "text<<$EOF" >> $GITHUB_OUTPUT
-          echo "$zip_name" >> $GITHUB_OUTPUT
+          echo "output-path=$zip_name" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
+          echo "Build cook: zip file is: "$zip_name
 
         done
