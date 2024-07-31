@@ -102,11 +102,11 @@ runs:
         fi
 
         # Rename the archive to add the version number
-        echo $dir
         for dir in ${{ inputs.archive_path}}*
         do
           echo "Build cook: list files or folders: "$dir
           new_name="NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
-          mv "$dir" "$new_name"        
-          echo "./$new_name" >> $GITHUB_OUTPUT
+          mv "$dir" "$new_name"
+          echo "Build cook: output folder name changed from: "$(basename $dir)" to: "$new_name
+          echo "$new_name" >> $GITHUB_OUTPUT
         done
