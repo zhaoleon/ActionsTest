@@ -108,8 +108,9 @@ runs:
           new_name="NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
           mv "$dir" "$new_name"
           echo "Build cook: output folder name changed from: "$(basename $dir)" to: "$new_name
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "text<<$EOF" >> $GITHUB_OUTPUT
+          #EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          #echo "text<<$EOF" >> $GITHUB_OUTPUT
+          new_name=$(echo $new_name | tr '\n' ' ')
           echo "$new_name" >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
+          #echo "$EOF" >> $GITHUB_OUTPUT
         done
