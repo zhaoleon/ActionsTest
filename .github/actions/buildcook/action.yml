@@ -104,8 +104,8 @@ runs:
         # Rename the archive to add the version number
         for dir in ${{ inputs.archive_path }}*
         do
-          new_name=$dir""NCar${{ inputs.app_version }}_${{ github.run_number }}
+          new_name=$dir""NCar${{ inputs.app_version }}${{ github.run_number }}
           mv "$dir" "$new_name"
-          new_name_base=./Output/$(basename $new_name)
+          new_name_base=Output/$(basename $new_name)
           echo "$new_name_base" >> $GITHUB_OUTPUT
         done
