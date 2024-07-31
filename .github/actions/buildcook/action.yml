@@ -107,13 +107,13 @@ runs:
           echo "Build cook: list files or folders: "$dir
 
           echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
-          new_name=NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
+          new_name="NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
           new_name_path="Output/"$new_name
           mv "$dir" "$new_name_path"
 
           echo "Build cook: Compressing output files..."
           cd Output
-          
+
           zip_name=$new_name".zip"
           zip_folder=$new_name/*
           zip -rqu $zip_name $zip_folder
