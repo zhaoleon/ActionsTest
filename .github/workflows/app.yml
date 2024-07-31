@@ -190,7 +190,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: ./Output/${{ steps.compress-output.outputs.output-path }}
-          name: NCar${{ inputs.app_version }}_${{ github.run_number }}
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
