@@ -103,7 +103,7 @@ jobs:
         env: 
           build-output: ${{ steps.build-cook-package.outputs.output-path }}
         with:
-          path: ${{ env.build-output }}
+          path: ./Output/${{ env.build-output }}
           name: NCar${{ inputs.app_version }}_${{ github.run_number }}
 
   deploy:
