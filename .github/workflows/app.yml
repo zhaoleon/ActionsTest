@@ -77,7 +77,7 @@ jobs:
     outputs: 
       dispatch-release: ${{ steps.check-if-release-dispatch.outputs.publish_release }}
       push-release: ${{ steps.check-if-release-push.outputs.publish_release }}
-      zip-file: ${{ github.env.output-path }}
+      zip-file: ${{ steps.compress-output.outputs.output-path }}
 
     steps:
       - name: Checkout project
@@ -87,28 +87,109 @@ jobs:
           fetch-depth: 0
           repository: ${{ github.repository }}
 
-      - name: Build cook package
-        id: build-cook-package
-        uses: ./.github/actions/buildcook
-        with:
-          app_version: ${{ env.app_version }} 
-          environment: ${{ env.environment }} 
-          build_config: ${{ env.build_config }} 
-          platform: ${{ env.platform }} 
-          maps: ${{ env.maps}} 
-          archive: ${{ env.archive }} 
-          archive_path: ${{ env.archive_path }}
+      # - name: Build cook package
+      #   id: build-cook-package
+      #   uses: ./.github/actions/buildcook
+      #   with:
+      #     app_version: ${{ env.app_version }} 
+      #     environment: ${{ env.environment }} 
+      #     build_config: ${{ env.build_config }} 
+      #     platform: ${{ env.platform }} 
+      #     maps: ${{ env.maps}} 
+      #     archive: ${{ env.archive }} 
+      #     archive_path: ${{ env.archive_path }}
       
-      - name: Show build cook run output
+      # - name: Show build cook run output
+      #   run: |
+      #     echo "Build cook run output: "${{ steps.build-cook-package.outputs }}
+      #     echo "Build cook run output: ./Output/"${{ github.env.output-path}}
+      - name: Build cook package
+        id: build-cook-package        
+        env: 
+          m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
+          # m_buildConfig: ${{ env.build_config }}  #"Development"
+          # m_platform: ${{ env.platform }} #"linux"
+          # m_archive: ${{ env.archive }} #"true"
+          # m_app_version: ${{ env.app_version }}
+          # m_archivePath: ${{ env.archive_path }}
+          # m_maps: ${{ env.maps}} #"false"
         run: |
-          echo "Build cook run output: "${{ steps.build-cook-package.outputs }}
-          echo "Build cook run output: ./Output/"${{ github.env.output-path}}
+          echo 'Project path on runner is: '${{ github.workspace }}
+
+          m_archivePath=${{ env.archive_path }}
+          if [ "${m_archivePath:-1}"!="/"];then
+            m_archivePath="${{ env.archive_path }}/"
+          fi
+
+          echo 'Package archive path is: '${{ env.archive_path }}
+
+          # Make sure there is only one uproject file in the project.
+          uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+          if [ "$uprojectCount" != 1 ]; then
+            echo "::error::$uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
+            exit 3
+          fi
+
+          # Search for *.uproject file in the upper folder and change the relative path into absolute
+          uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
+
+          if ${{ env.archive }}; then
+            archiveArg="-archive -archivedirectory=${{ env.archive_path }}"
+          else
+            archiveArg=""
+          fi
+
+          # if [[ -n "$m_maps" ]]; then
+          #   mapsArg="-map=${{ env.maps}}"
+          # else
+          #   mapsArg=""
+          # fi
+
+          command="${{ env.m_runUatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+
+          echo -e "buildcookrun commandline is:\n"$command
+          sh -c "$command"
+      
+      - name: Compress output
+        id: compress-output
+        shell: bash
+        run: |
+          # Check archive path exist
+          if [ ! -d "${{ env.archive_path }}" ]; then
+            echo "Error: Package failed, archive output folder does not exist..."
+            exit 2
+          fi
+
+          # Rename the archive to add the version number
+          for dir in ${{ env.archive_path }}*
+          do
+            echo "Build cook: list files or folders: "$dir
+
+            new_name="NCar_Linux"${{ env.app_version }}_${{ github.run_number }}
+            new_name_path="./Output/"$new_name
+            echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
+            mv "$dir" "$new_name_path"
+
+            echo "Build cook: Compressing output files..."
+            cd Output
+            zip_name=$new_name".zip"
+            zip_folder=$new_name/*
+            zip -rqu $zip_name $zip_folder
+
+            echo "Build cook: Unreal build cook run completed..."      
+            echo "output-path=$zip_name" >> "$GITHUB_OUTPUT"
+            echo "Build cook: zip file is: "$zip_name
+          done
+
+      - name: Show compress result
+        run: |
+          echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          path: ./Output/${{ github.env.output-path }}
+          path: ./Output/${{ steps.compress-output.outputs.output-path }}
           name: NCar${{ inputs.app_version }}_${{ github.run_number }}
 
   deploy:
