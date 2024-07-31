@@ -77,7 +77,7 @@ jobs:
     outputs: 
       dispatch-release: ${{ steps.check-if-release-dispatch.outputs.publish_release }}
       push-release: ${{ steps.check-if-release-push.outputs.publish_release }}
-      zip-file: ./Output/${{ github.env.output-path }}
+      zip-file: ${{ github.env.output-path }}
 
     steps:
       - name: Checkout project
@@ -102,12 +102,11 @@ jobs:
       - name: Show build cook run output
         run: |
           echo "Build cook run output: "${{ steps.build-cook-package.outputs }}
+          echo "Build cook run output: ./Output/"${{ github.env.output-path}}
 
       - name: Upload artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v4
-        env: 
-          build-output: ${{ steps.build-cook-package.outputs.output-path }}
         with:
           path: ./Output/${{ github.env.output-path }}
           name: NCar${{ inputs.app_version }}_${{ github.run_number }}
@@ -132,7 +131,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with: 
-          path: ${{ needs.build-app.outputs.zip-file }}
+          path: ${{ github.workspace }}
 
       - name: Create release
         id: create_release
