@@ -217,5 +217,5 @@ jobs:
         id: create_release
         run: |
           echo "Create release: Creating release..."
-          gh release create ${{ env.app_version }} "./artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
+          gh release create ${{ env.app_version }} "${{ github.workspace }}/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
           
