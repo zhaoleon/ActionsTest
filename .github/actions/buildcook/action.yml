@@ -42,7 +42,10 @@ outputs:
     description: 'Unreal project output path'
     value: ${{ steps.run-uat.outputs.output }}
 
-env: 
+runs:
+  using: 'composite'
+
+  env: 
   m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
   m_buildConfig: ${{ inputs.build_config }} #"Development"
   m_platform: ${{ inputs.platform }} #"linux"
@@ -50,9 +53,6 @@ env:
   m_app_version: ${{ inputs.app_version }}
   m_archivePath: ${{ inputs.archive_path }}
   m_maps: ${{ inputs.maps }} #"false"
-
-runs:
-  using: 'composite'
 
   steps:
     - name: Build cook and package unreal project
