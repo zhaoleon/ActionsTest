@@ -98,6 +98,10 @@ jobs:
           maps: ${{ env.maps}} 
           archive: ${{ env.archive }} 
           archive_path: ${{ env.archive_path }}
+      
+      - name: Show build cook run output
+        run: |
+          echo "Build cook run output: "${{ steps.build-cook-package.outputs }}
 
       - name: Upload artifacts
         id: upload-artifacts
