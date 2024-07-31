@@ -216,7 +216,7 @@ jobs:
       - name: Create release
         id: create_release
         run: |
-          artifact-path=${{ needs.build-app.outputs.zip-file }}
+          artifact-path=./artifact/${{ needs.build-app.outputs.zip-file }}
           if [ -e $artifact-path ]; then
             echo "Create release: Creating release"
             gh release create ${{ env.app_version }} $artifact-path --generate-notes -t 'Release ${{ env.app_version }}'
