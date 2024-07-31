@@ -101,7 +101,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         env: 
-          build-output: ${{ steps.build-cook-package.outputs.output-path || steps.build-cook-package.outputs.output-path2 }}
+          build-output: ${{ steps.build-cook-package.outputs.output-path }}
         with:
           path: ${{ env.build-output }}
           name: NCar${{ inputs.app_version }}_${{ github.run_number }}
