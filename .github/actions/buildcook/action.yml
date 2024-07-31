@@ -118,7 +118,7 @@ runs:
           echo "Build cook: Unreal build cook run completed..."
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "text<<$EOF" >> $GITHUB_OUTPUT
-          echo "'Output/'$new_name_path'.zip'" >> $GITHUB_OUTPUT
+          echo "Output/"$new_name_path".zip" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
         done
