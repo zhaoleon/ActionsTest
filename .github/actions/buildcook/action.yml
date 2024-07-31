@@ -105,12 +105,20 @@ runs:
         for dir in ${{ inputs.archive_path}}*
         do
           echo "Build cook: list files or folders: "$dir
-          new_name="NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
-          mv "$dir" "$new_name"
-          echo "Build cook: output folder name changed from: "$(basename $dir)" to: "$new_name
-          #EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          #echo "text<<$EOF" >> $GITHUB_OUTPUT
-          new_name=$(echo $new_name | tr '\n' ' ')
-          echo "$new_name" >> $GITHUB_OUTPUT
-          #echo "$EOF" >> $GITHUB_OUTPUT
+
+          echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
+          new_name=NCar_Linux"${{ inputs.app_version }}_${{ github.run_number }}
+          new_name_path="Output/"$new_name
+          mv "$dir" "$new_name_path"
+
+          echo "Build cook: Compressing output files..."
+          cd Output
+          zip -rqu $new_name".zip" $new_name/*
+
+          echo "Build cook: Unreal build cook run completed..."
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "text<<$EOF" >> $GITHUB_OUTPUT
+          echo "'Output/'$new_name_path'.zip'" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
         done
