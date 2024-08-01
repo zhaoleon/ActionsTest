@@ -50,7 +50,6 @@ on:
 
 env: 
   app_version: ${{ inputs.app_version !='' && inputs.app_version || '' }}
-  tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || false }}
   environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
   platform: ${{ inputs.platform !='' && inputs.platform || 'Linux' }} 
@@ -187,16 +186,15 @@ jobs:
 
     name: Create release
     needs: build-app
-    
-    defaults:
-      run:
-        working-directory: ${{ env.archive_path }} 
-    
+        
+    env:
+      artifact_path: /home/ubuntu/ci-runner-artifact/
+
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with: 
-          path: ${{ github.workspace }}
+          path: ${{ env.artifact_path }}
 
       - name: Create release
         id: create_release
@@ -207,4 +205,10 @@ jobs:
           else
             release_tag=""
           fi
-          gh release create $release_tag${{ github.run_number }} "${{ github.workspace }}/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
+          gh release create $release_tag${{ github.run_number }} ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
+      
+      - name: Clean artifact
+        id: clean-artifact
+        run: |
+          echo 'Deleting intermediate artifact ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}...'
+          rm -f ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}
