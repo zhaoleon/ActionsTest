@@ -129,7 +129,7 @@ jobs:
       - name: Compress output
         id: compress-output
         shell: bash
-        if: ${{ env.archive }}
+        if: ${{ env.archive == 'true' }}
         run: |
           # Check archive path exist
           if [ ! -d "${{ env.archive_path }}" ]; then
@@ -165,12 +165,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: ${{ env.archive }}
+        if: ${{ env.archive == 'true' }}
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload artifacts
-        if: ${{ env.archive }}
+        if: ${{ env.archive =='true' }}
         id: upload-artifacts
         uses: actions/upload-artifact@v4
         with:
