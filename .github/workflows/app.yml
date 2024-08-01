@@ -142,7 +142,7 @@ jobs:
             echo "Build cook: list files or folders: "$dir
 
             if [ ${{ env.app_version != '' }} ]; then
-              version_version='_'${{ env.app_version }}
+              version_version=_${{ env.app_version }}
             else
               version_version=''
             fi
