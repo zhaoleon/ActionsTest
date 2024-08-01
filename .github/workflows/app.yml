@@ -190,19 +190,19 @@ jobs:
         with: 
           path: ${{ env.artifact_path }}
 
-      - name: Create release
-        id: create_release
-        run: |
-          echo "Create release: Creating release..."
-          if ${{ env.app_version != '' }}; then
-            release_tag=${{ env.app_version }}'.'
-          else
-            release_tag=''
-          fi
+      # - name: Create release
+      #   id: create_release
+      #   run: |
+      #     echo "Create release: Creating release..."
+      #     if ${{ env.app_version != '' }}; then
+      #       release_tag=${{ env.app_version }}'.'
+      #     else
+      #       release_tag=''
+      #     fi
 
-          command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
-          echo -e "Create release: commandline is:\n"$command
-          sh -c "$command"
+      #     command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
+      #     echo -e "Create release: commandline is:\n"$command
+      #     sh -c "$command"
       
       - name: Clean artifact
         if: always()
