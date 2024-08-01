@@ -142,9 +142,9 @@ jobs:
             echo "Build cook: list files or folders: "$dir
 
             if [ ${{ env.app_version != '' }} ]; then
-              version_version="_"${{ env.app_version }}
+              version_version='_'${{ env.app_version }}
             else
-              version_version=""
+              version_version=''
             fi
 
             new_name="NCar_Linux"$version_version"."${{ github.run_number }}
@@ -201,13 +201,14 @@ jobs:
         run: |
           echo "Create release: Creating release..."
           if [ ${{ env.app_version != '' }} ]; then
-            release_tag=${{ env.app_version }}"."
+            release_tag=${{ env.app_version }}'.'
           else
-            release_tag=""
+            release_tag=''
           fi
           gh release create $release_tag${{ github.run_number }} ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
       
       - name: Clean artifact
+        if: always()
         id: clean-artifact
         run: |
           echo 'Deleting intermediate artifact ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}...'
