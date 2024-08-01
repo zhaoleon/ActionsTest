@@ -49,7 +49,7 @@ on:
         default: true
 
 env: 
-  app_version: ${{ inputs.app_version !='' && inputs.app_version || github.run_number }}
+  app_version: ${{ inputs.app_version !='' }} && (${{ inputs.app_version }} '.' ${{ github.run_number }}) || ${{ github.run_number }}
   tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || false }}
   environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
@@ -143,7 +143,7 @@ jobs:
             echo "Build cook: list files or folders: "$dir
 
             if [ ${{ env.app_version != '' }} ]; then
-              version_version="."${{ env.app_version }}
+              version_version="_"${{ env.app_version }}
             else
               version_version=""
             fi
