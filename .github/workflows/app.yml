@@ -200,7 +200,7 @@ jobs:
             release_tag=''
           fi
 
-          command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'"
+          command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
           echo -e "Create release: commandline is:\n"$command
           sh -c "$command"
       
