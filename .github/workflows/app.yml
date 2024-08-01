@@ -1,5 +1,5 @@
 name: 'NCar-Unreal-Builder'
-run-name: App build 
+run-name: ${{ format('NCar build | {0} | {1} | {3} | {4}', inputs.build_config, inputs.platform, inputs.archive && 'Release' || 'NoRelease', inputs.app_version != '' && inputs.app_version || github.run_number) }}
 
 on:
   push:
@@ -174,7 +174,7 @@ jobs:
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    if: ${{ inputs.archive }}
+    if: ${{ inputs.archive && false || true }}
 
     permissions:
       contents: write
