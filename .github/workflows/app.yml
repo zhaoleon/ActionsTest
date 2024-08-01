@@ -7,7 +7,8 @@ run-name: |
 
 on:
   push:
-    branches: [**]
+    branches: 
+      - '**'
     tags: []
   workflow_dispatch:
     inputs:
