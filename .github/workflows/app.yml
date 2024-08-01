@@ -49,7 +49,7 @@ on:
         default: true
 
 env: 
-  app_version: ${{ inputs.app_version !='' }} && (${{ inputs.app_version }} '.' ${{ github.run_number }}) || ${{ github.run_number }}
+  app_version: ${{ inputs.app_version !='' && inputs.app_version || '' }}
   tag: ${{ inputs.app_version !='' && startsWith(inputs.app_version, 'v') || false }}
   environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
@@ -202,4 +202,9 @@ jobs:
         id: create_release
         run: |
           echo "Create release: Creating release..."
-          gh release create ${{ env.app_version }} "${{ github.workspace }}/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
+          if [ ${{ env.app_version != '' }} ]; then
+            release_tag=${{ env.app_version }}"."
+          else
+            release_tag=""
+          fi
+          gh release create $release_tag${{ github.run_number }} "${{ github.workspace }}/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
