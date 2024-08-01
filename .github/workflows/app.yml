@@ -197,9 +197,9 @@ jobs:
           if ${{ env.app_version != '' }}; then
             release_tag=${{ env.app_version }}'.'
           else
-            release_tag=''
+            release_tag=${{ github.run_number }}
           fi
-          gh release create $release_tag${{ github.run_number }} ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t "Release ${{ env.app_version }}"
+          gh release create $release_tag${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t "Release "$release_tag
       
       - name: Clean artifact
         if: always()
