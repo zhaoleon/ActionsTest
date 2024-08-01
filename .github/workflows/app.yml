@@ -1,9 +1,9 @@
 name: 'NCar-Unreal-Builder'
 run-name: |
-  " ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
+  \"  ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
   | ${{ inputs.platform != '' && inputs.platform || 'Linux' }} 
   | ${{ inputs.archive && 'Release' || 'NoRelease' }} 
-  | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }}"
+  | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }}\"
 
 on:
   push:
