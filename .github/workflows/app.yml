@@ -147,7 +147,7 @@ jobs:
               version_version=''
             fi
 
-            new_name="NCar_Linux"$version_version"."${{ github.run_number }}
+            new_name="NCar_Linux""$version_version""."${{ github.run_number }}
             new_name_path="./Output/"$new_name
             echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
             mv "$dir" "$new_name_path"
@@ -205,11 +205,11 @@ jobs:
           else
             release_tag=''
           fi
-          gh release create $release_tag${{ github.run_number }} ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
+          gh release create "$release_tag"${{ github.run_number }} ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release ${{ env.app_version }}'
       
       - name: Clean artifact
         if: always()
         id: clean-artifact
         run: |
-          echo 'Deleting intermediate artifact ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}...'
+          echo "Deleting intermediate artifact ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }}..."
           rm -f ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}
