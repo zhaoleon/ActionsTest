@@ -55,7 +55,7 @@ env:
   environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
   platform: ${{ inputs.platform !='' && inputs.platform || 'Linux' }} 
-  archive: ${{ inputs.archive && false || true }}
+  archive: ${{ inputs.archive && true || false }}
   archive_path: '${{ github.workspace }}/Output/'
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
 
@@ -179,7 +179,7 @@ jobs:
 
   deploy:
     runs-on: [self-hosted, CICDForUnreal, Linux]
-    if: ${{ inputs.archive && false || true }}
+    if: ${{ inputs.archive && true || false }}
 
     permissions:
       contents: write
