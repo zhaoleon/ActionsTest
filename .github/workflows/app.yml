@@ -3,7 +3,7 @@ run-name: |
   ' ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
   | ${{ inputs.platform != '' && inputs.platform || 'Linux' }} 
   | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }}  
-  | ${{ inputs.archive && 'Release' || 'NoRelease' }} 
+  | ${{ inputs.archive && 'Release  ' || 'NoRelease' }} 
   | ${{ github.event_name }}'
 
 on:
@@ -19,8 +19,8 @@ on:
         required: true
         type: choice
         options:
-          - 'DEV'
-          - 'UAT'
+          - 'DEV '
+          - 'UAT '
           - 'PROD'
         default: 'DEV'
       build_config:
@@ -29,8 +29,8 @@ on:
         required: true
         options:
           - 'Development'
-          - 'DebugGame'
-          - 'Shipping'
+          - 'DebugGame  '
+          - 'Shipping   '
         default: 'Development'
       platform:
         description: 'Platform to build for'
