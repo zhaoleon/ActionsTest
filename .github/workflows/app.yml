@@ -11,7 +11,7 @@ on:
     inputs:
       app_version:
         description: 'The version of the app to be built, if empty it would be workflow run number'
-        required: true
+        required: false
         default: ''
       environment:
         description: 'The deployment environment'
@@ -29,7 +29,7 @@ on:
         options:
           - 'Development'
           - 'DebugGame  '
-          - "Shipping   "
+          - 'Shipping   '
         default: 'Development'
       platform:
         description: 'Platform to build for'
