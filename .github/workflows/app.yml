@@ -71,6 +71,8 @@ jobs:
         run: |
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
+          echo 'Env: push has tag: ${{ github.ref.tags }}'
+          echo 'Env: archive value: ${{ env.archive }}'
 
       - name: Checkout project
         uses: actions/checkout@v4
@@ -116,7 +118,6 @@ jobs:
       
       - name: Compress output
         id: compress-output
-        shell: bash
         if: ${{ env.archive || contains(github.ref, 'refs/tags') }}
         run: |
           # Check archive path exist
