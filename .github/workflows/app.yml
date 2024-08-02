@@ -192,5 +192,5 @@ jobs:
         id: clean-artifact
         run: |
           echo "Deleting intermediate artifact..."
-          rm -f ${{ github.workspace }}/*
+          rm -rf ${{ github.workspace }}/*
 
