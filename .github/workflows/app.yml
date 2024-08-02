@@ -9,8 +9,6 @@ run-name: |
 
 on:
   push:
-    tags:
-      '**'
   workflow_dispatch:
     inputs:
       app_version:
@@ -74,7 +72,7 @@ jobs:
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
           echo 'Env: whether push has tags: ${{ contains(github.ref, 'refs/tags') }}'
-          echo 'Env: push has tag: ${{ github.ref.tags }}'
+          echo 'Env: push has tag: ${{ github.ref.tag }}'
           echo 'Env: archive value: ${{ env.archive }}'
 
       - name: Checkout project
