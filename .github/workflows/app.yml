@@ -12,8 +12,8 @@ on:
   push:
     branches:
       - '**'
-    tags-ignore:
-      - '**'
+    # tags-ignore:
+    #   - '**'
   workflow_dispatch:
     inputs:
       app_version:
@@ -66,155 +66,163 @@ env:
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
 
 jobs:
-  clean-workspace:
-    name: Clean the workflow workspace
+  get-tags:
     runs-on: [self-hosted, Linux, linux-x64-ue541]
-
-    steps:
-      # Clean the workspace by deleting the old version
-      - name: Clean workspace
+    steps: 
+      - name: Get tags
+        if: ${{ contains(github.ref, 'refs/tags/') }}
         run: |
-          echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
-          rm -rf ${{ github.workspace }}/*
+          tag_name=$(basename ${{ github.ref }})
+          echo "pushed tag is: "$tag_name
+  # clean-workspace:
+  #   name: Clean the workflow workspace
+  #   runs-on: [self-hosted, Linux, linux-x64-ue541]
 
-  build-app:
-    name: Build unreal project
-    runs-on: [self-hosted, Linux, linux-x64-ue541]
-    needs: clean-workspace
-    outputs: 
-      zip-file: ${{ steps.compress-output.outputs.output-path }}
+  #   steps:
+  #     # Clean the workspace by deleting the old version
+  #     - name: Clean workspace
+  #       run: |
+  #         echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
+  #         rm -rf ${{ github.workspace }}/*
 
-    steps:
-      - name: Checkout project
-        uses: actions/checkout@v4
-        with: 
-          lfs: true
-          fetch-depth: 0
-          repository: ${{ github.repository }}
+  # build-app:
+  #   name: Build unreal project
+  #   runs-on: [self-hosted, Linux, linux-x64-ue541]
+  #   needs: clean-workspace
+  #   outputs: 
+  #     zip-file: ${{ steps.compress-output.outputs.output-path }}
 
-      - name: Build cook package
-        id: build-cook-package        
-        env: 
-          m_runUatPath: "/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
-        run: |
-          echo 'Project path on runner is: '${{ github.workspace }}
+  #   steps:
+  #     - name: Checkout project
+  #       uses: actions/checkout@v4
+  #       with: 
+  #         lfs: true
+  #         fetch-depth: 0
+  #         repository: ${{ github.repository }}
 
-          m_archivePath=${{ env.archive_path }}
-          if [ "${m_archivePath:-1}"!="/"];then
-            m_archivePath="${{ env.archive_path }}/"
-          fi
+  #     - name: Build cook package
+  #       id: build-cook-package        
+  #       env: 
+  #         m_runUatPath: "/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
+  #       run: |
+  #         echo 'Project path on runner is: '${{ github.workspace }}
 
-          echo 'Package archive path is: '${{ env.archive_path }}
+  #         m_archivePath=${{ env.archive_path }}
+  #         if [ "${m_archivePath:-1}"!="/"];then
+  #           m_archivePath="${{ env.archive_path }}/"
+  #         fi
 
-          # Make sure there is only one uproject file in the project.
-          uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
-          if [ "$uprojectCount" != 1 ]; then
-            echo "::error::$uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
-            exit 3
-          fi
+  #         echo 'Package archive path is: '${{ env.archive_path }}
 
-          # Search for *.uproject file in the upper folder and change the relative path into absolute
-          uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
+  #         # Make sure there is only one uproject file in the project.
+  #         uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+  #         if [ "$uprojectCount" != 1 ]; then
+  #           echo "::error::$uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
+  #           exit 3
+  #         fi
 
-          if ${{ env.archive }}; then
-            archiveArg="-archive -archivedirectory=${{ env.archive_path }}"
-          else
-            archiveArg=""
-          fi
+  #         # Search for *.uproject file in the upper folder and change the relative path into absolute
+  #         uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-          command="${{ env.m_runUatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+  #         if ${{ env.archive }}; then
+  #           archiveArg="-archive -archivedirectory=${{ env.archive_path }}"
+  #         else
+  #           archiveArg=""
+  #         fi
 
-          echo -e "buildcookrun commandline is:\n"$command
-          sh -c "$command"
+  #         command="${{ env.m_runUatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+
+  #         echo -e "buildcookrun commandline is:\n"$command
+  #         sh -c "$command"
       
-      - name: Compress output
-        id: compress-output
-        shell: bash
-        if: ${{ env.archive == 'true' }}
-        run: |
-          # Check archive path exist
-          if [ ! -d "${{ env.archive_path }}" ]; then
-            echo "Error: Package failed, archive output folder does not exist..."
-            exit 2
-          fi
+  #     - name: Compress output
+  #       id: compress-output
+  #       shell: bash
+  #       if: ${{ env.archive == 'true' }}
+  #       run: |
+  #         # Check archive path exist
+  #         if [ ! -d "${{ env.archive_path }}" ]; then
+  #           echo "Error: Package failed, archive output folder does not exist..."
+  #           exit 2
+  #         fi
 
-          # Rename the archive to add the version number
-          for dir in ${{ env.archive_path }}*
-          do
-            echo "Build cook: list files or folders: "$dir
+  #         # Rename the archive to add the version number
+  #         for dir in ${{ env.archive_path }}*
+  #         do
+  #           echo "Build cook: list files or folders: "$dir
 
-            if ${{ env.app_version != '' }}; then
-              version_version=_${{ env.app_version }}
-            else
-              version_version=''
-            fi
+  #           if ${{ env.app_version != '' }}; then
+  #             version_version=_${{ env.app_version }}
+  #           else
+  #             version_version=''
+  #           fi
 
-            new_name="NCar_Linux""$version_version""."${{ github.run_number }}
-            new_name_path="./Output/"$new_name
-            echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
-            mv "$dir" "$new_name_path"
+  #           new_name="NCar_Linux""$version_version""."${{ github.run_number }}
+  #           new_name_path="./Output/"$new_name
+  #           echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
+  #           mv "$dir" "$new_name_path"
 
-            echo "Build cook: Compressing output files..."
-            cd Output
-            zip_name=$new_name".zip"
-            zip_folder=$new_name/*
-            zip -rqu $zip_name $zip_folder
+  #           echo "Build cook: Compressing output files..."
+  #           cd Output
+  #           zip_name=$new_name".zip"
+  #           zip_folder=$new_name/*
+  #           zip -rqu $zip_name $zip_folder
 
-            echo "Build cook: Unreal build cook run completed..."      
-            echo "output-path=$zip_name" >> "$GITHUB_OUTPUT"
-            echo "Build cook: zip file is: "$zip_name
-          done
+  #           echo "Build cook: Unreal build cook run completed..."      
+  #           echo "output-path=$zip_name" >> "$GITHUB_OUTPUT"
+  #           echo "Build cook: zip file is: "$zip_name
+  #         done
 
-      - name: Show compress result
-        if: ${{ env.archive == 'true' }}
-        run: |
-          echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
+  #     - name: Show compress result
+  #       if: ${{ env.archive == 'true' }}
+  #       run: |
+  #         echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
-      - name: Upload artifacts
-        if: ${{ env.archive =='true' }}
-        id: upload-artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./Output/${{ steps.compress-output.outputs.output-path }}
+  #     - name: Upload artifacts
+  #       if: ${{ env.archive =='true' }}
+  #       id: upload-artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         path: ./Output/${{ steps.compress-output.outputs.output-path }}
 
-  deploy:
-    runs-on: [self-hosted, Linux, linux-x64-ue541]
-    if: ${{ inputs.archive && true || false }}
+  # deploy:
+  #   runs-on: [self-hosted, Linux, linux-x64-ue541]
+  #   if: ${{ inputs.archive && true || false }}
 
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
+  #   permissions:
+  #     contents: write
+  #     pull-requests: write
+  #     repository-projects: write
 
-    name: Create release
-    needs: build-app
+  #   name: Create release
+  #   needs: build-app
         
-    env:
-      artifact_path: /home/ubuntu/ci-runner-artifact/
+  #   env:
+  #     artifact_path: /home/ubuntu/ci-runner-artifact/
 
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with: 
-          path: ${{ env.artifact_path }}
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with: 
+  #         path: ${{ env.artifact_path }}
 
-      - name: Create release
-        id: create_release
-        run: |
-          echo "Create release: Creating release..."
-          if ${{ env.app_version != '' }}; then
-            release_tag=${{ env.app_version }}'.'
-          else
-            release_tag=''
-          fi
+  #     - name: Create release
+  #       id: create_release
+  #       run: |
+  #         echo "Create release: Creating release..."
+  #         if ${{ env.app_version != '' }}; then
+  #           release_tag=${{ env.app_version }}'.'
+  #         else
+  #           release_tag=''
+  #         fi
 
-          command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
-          echo -e "Create release: commandline is:\n"$command
-          sh -c "$command"
+  #         command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
+  #         echo -e "Create release: commandline is:\n"$command
+  #         sh -c "$command"
       
-      - name: Clean artifact
-        if: always()
-        id: clean-artifact
-        run: |
-          echo "Deleting intermediate artifact ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }}..."
-          rm -f ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}
+  #     - name: Clean artifact
+  #       if: always()
+  #       id: clean-artifact
+  #       run: |
+  #         echo "Deleting intermediate artifact ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }}..."
+  #         rm -f ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}
