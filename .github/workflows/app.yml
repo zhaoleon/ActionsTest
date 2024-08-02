@@ -70,7 +70,6 @@ jobs:
     runs-on: [self-hosted, Linux, linux-x64-ue541]
     steps: 
       - name: Get tags
-        if: ${{ contains(github.ref, 'refs/tags/') }}
         run: |
           tag_name=$(basename ${{ github.ref }})
           echo "pushed tag is: "$tag_name
