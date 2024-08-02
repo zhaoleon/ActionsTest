@@ -58,7 +58,7 @@ on:
 
 env: 
   app_version: ${{ inputs.app_version !='' && inputs.app_version || '' }}
-  environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
+  #environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
   platform: ${{ inputs.platform !='' && inputs.platform || 'Linux' }} 
   archive: ${{ inputs.archive && true || false }}
@@ -66,8 +66,8 @@ env:
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
 
 jobs:
-  clean-workspace:
-    name: Clean the workflow workspace
+  build-app:
+    name: Build unreal project
     runs-on: [self-hosted, Linux, linux-x64-ue541]
 
     steps:
@@ -77,14 +77,6 @@ jobs:
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
 
-  build-app:
-    name: Build unreal project
-    runs-on: [self-hosted, Linux, linux-x64-ue541]
-    needs: clean-workspace
-    outputs: 
-      zip-file: ${{ steps.compress-output.outputs.output-path }}
-
-    steps:
       - name: Checkout project
         uses: actions/checkout@v4
         with: 
@@ -130,7 +122,7 @@ jobs:
       - name: Compress output
         id: compress-output
         shell: bash
-        if: ${{ env.archive == 'true' }}
+        if: ${{ env.archive == 'true' }} || ${{ contains(github.ref, 'refs/tags') }}
         run: |
           # Check archive path exist
           if [ ! -d "${{ env.archive_path }}" ]; then
@@ -166,39 +158,20 @@ jobs:
           done
 
       - name: Show compress result
-        if: ${{ env.archive == 'true' }}
+        if: ${{ env.archive == 'true' }} || ${{ contains(github.ref, 'refs/tags') }}
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
-      - name: Upload artifacts
-        if: ${{ env.archive =='true' }}
-        id: upload-artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./Output/${{ steps.compress-output.outputs.output-path }}
-
-  deploy:
-    runs-on: [self-hosted, Linux, linux-x64-ue541]
-    if: ${{ inputs.archive && true || false }}
-
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
-
-    name: Create release
-    needs: build-app
-        
-    env:
-      artifact_path: /home/ubuntu/ci-runner-artifact/
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with: 
-          path: ${{ env.artifact_path }}
-
+      - name: Upload archive to S3
+        if: ${{ env.archive == 'true' }} || ${{ contains(github.ref, 'refs/tags') }}
+        run: |
+          echo "Uploading to a wonderful S3 bucket."
+          # upload to aws s3
+          # TODO: complete the s3 url
+          # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
+         
       - name: Create release
+        if: ${{ env.archive == 'true' }} || ${{ contains(github.ref, 'refs/tags') }}
         id: create_release
         run: |
           echo "Create release: Creating release..."
@@ -207,14 +180,16 @@ jobs:
           else
             release_tag=''
           fi
-
-          command="gh release create '$release_tag'${{ github.run_number }} ${{ env.artifact_path }}artifact/${{ needs.build-app.outputs.zip-file }} --generate-notes -t 'Release $release_tag'${{ github.run_number }}"
+          
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
+          command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
           echo -e "Create release: commandline is:\n"$command
           sh -c "$command"
-      
+
       - name: Clean artifact
         if: always()
         id: clean-artifact
         run: |
-          echo "Deleting intermediate artifact ${{ env.artifact_path }}/artifact/${{ needs.build-app.outputs.zip-file }}..."
-          rm -f ${{ env.artifact_path }}"/artifact/"${{ needs.build-app.outputs.zip-file }}
+          echo "Deleting intermediate artifact..."
+          rm -f ${{ github.workspace }}/*
+
