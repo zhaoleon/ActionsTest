@@ -8,12 +8,12 @@ run-name: |
   | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }} "
 
 on:
-  # Set branches as all and release as prereleased can avoid workflow triggerring itself continiously in loop
+  # Setting branches and tags-ignore can avoid workflow triggerring itself continiously in loop
   push:
     branches:
       - '**'
-  release:
-    types: [prereleased]
+    tags-ignore:
+      - '**'
   workflow_dispatch:
     inputs:
       app_version:
