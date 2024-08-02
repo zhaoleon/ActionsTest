@@ -1,3 +1,5 @@
+# Please adjust runner's label in every jobs' related sections to as the repository setting before running this workflow
+
 name: 'NCar-Unreal-Builder'
 run-name: |
   " ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
@@ -6,26 +8,28 @@ run-name: |
   | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }} "
 
 on:
+  # Set branches as all and release as prereleased can avoid workflow triggerring itself continiously in loop
   push:
     branches:
       - '**'
   release:
-    types: []
+    types: [prereleased]
   workflow_dispatch:
     inputs:
       app_version:
         description: 'The version of the app to be built, if empty it would be workflow run number'
         required: false
         default: ''
-      environment:
-        description: 'The deployment environment'
-        required: true
-        type: choice
-        options:
-          - 'DEV '
-          - 'UAT '
-          - 'PROD'
-        default: 'DEV'
+      # environment variable might will be used in CD process to deploy artifact on specific deployment environment which is unavailable temporarily
+      # environment:
+      #   description: 'The deployment environment'
+      #   required: true
+      #   type: choice
+      #   options:
+      #     - 'DEV '
+      #     - 'UAT '
+      #     - 'PROD'
+      #   default: 'DEV'
       build_config:
         description: 'Configuration to use'
         type: choice
