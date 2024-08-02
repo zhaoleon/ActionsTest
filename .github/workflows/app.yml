@@ -64,6 +64,7 @@ env:
 jobs:
   get-tags:
     runs-on: [self-hosted, Linux, linux-x64-ue541]
+    
     steps: 
       - name: Get tags
         run: |
