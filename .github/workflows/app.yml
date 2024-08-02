@@ -181,7 +181,8 @@ jobs:
             release_tag=''
           fi
           
-          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
+          # TODO: enable this except testing
+          #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
           command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
           echo -e "Create release: commandline is:\n"$command
           sh -c "$command"
