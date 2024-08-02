@@ -10,8 +10,6 @@ run-name: |
 on:
   # Setting branches and tags-ignore can avoid workflow triggerring itself continiously in loop
   push:
-    branches:
-      - '**'
     # tags-ignore:
     #   - '**'
     tags:
