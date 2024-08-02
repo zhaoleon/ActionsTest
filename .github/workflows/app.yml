@@ -8,7 +8,6 @@ run-name: |
   | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }} "
 
 on:
-  # Setting branches and tags-ignore can avoid workflow triggerring itself continiously in loop
   push:
   workflow_dispatch:
     inputs:
