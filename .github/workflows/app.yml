@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - '**'
+  release:
+    types: []
   workflow_dispatch:
     inputs:
       app_version:
