@@ -68,7 +68,7 @@ env:
 jobs:
   clean-workspace:
     name: Clean the workflow workspace
-    runs-on: [self-hosted, CICDForUnreal, Linux]
+    runs-on: [self-hosted, Linux, linux-x64-ue541]
 
     steps:
       # Clean the workspace by deleting the old version
@@ -79,7 +79,7 @@ jobs:
 
   build-app:
     name: Build unreal project
-    runs-on: [self-hosted, CICDForUnreal, Linux]
+    runs-on: [self-hosted, Linux, linux-x64-ue541]
     needs: clean-workspace
     outputs: 
       zip-file: ${{ steps.compress-output.outputs.output-path }}
@@ -95,7 +95,7 @@ jobs:
       - name: Build cook package
         id: build-cook-package        
         env: 
-          m_runUatPath: "/home/ubuntu/UE/Linux_Unreal_Engine_5.4.1/Engine/Build/BatchFiles/RunUAT.sh"
+          m_runUatPath: "/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
         run: |
           echo 'Project path on runner is: '${{ github.workspace }}
 
@@ -178,7 +178,7 @@ jobs:
           path: ./Output/${{ steps.compress-output.outputs.output-path }}
 
   deploy:
-    runs-on: [self-hosted, CICDForUnreal, Linux]
+    runs-on: [self-hosted, Linux, linux-x64-ue541]
     if: ${{ inputs.archive && true || false }}
 
     permissions:
