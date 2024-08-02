@@ -170,12 +170,17 @@ jobs:
         id: create_release
         run: |
           echo "Create release: Creating release..."
-          if ${{ env.app_version != '' }}; then
-            release_tag=${{ env.app_version }}'.'
+
+          if ${{ contains(github.ref, 'refs/tags') }}; then
+            release_tag=$(basename ${{ github.ref }})'.'
           else
-            release_tag=''
+            if ${{ env.app_version != '' }}; then
+              release_tag=${{ env.app_version }}'.'
+            else
+              release_tag=''
+            fi
           fi
-          
+
           # TODO: enable this except testing
           #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
           command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
