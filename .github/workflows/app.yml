@@ -71,7 +71,7 @@ jobs:
         run: |
           echo 'Deleting existing workspace: ${{ github.workspace }} before checkout the repo to ensure the project file is fresh'
           rm -rf ${{ github.workspace }}/*
-          echo 'Env: whether push has tags: ${{ contains(github.ref, 'refs/tags') }}'
+          echo 'Env: whether push has tags: ${{ startsWith(github.ref, 'refs/tags') }}'
           echo 'Env: push has tag: ${{ github.ref.tag }}'
           echo 'Env: archive value: ${{ env.archive }}'
 
@@ -106,7 +106,7 @@ jobs:
           # Search for *.uproject file in the upper folder and change the relative path into absolute
           uprojectPath=$(find .. -type f -name "*.uproject" | xargs -0 -I {} readlink -f {})
 
-          if ${{ env.archive || contains(github.ref, 'refs/tags') }}; then
+          if ${{ env.archive || startsWith(github.ref, 'refs/tags') }}; then
             archiveArg="-archive -archivedirectory=${{ env.archive_path }}"
           else
             archiveArg=""
@@ -119,7 +119,7 @@ jobs:
       
       - name: Compress output
         id: compress-output
-        if: ${{ env.archive || contains(github.ref, 'refs/tags') }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         run: |
           # Check archive path exist
           if [ ! -d "${{ env.archive_path }}" ]; then
@@ -155,12 +155,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: ${{ env.archive || contains(github.ref, 'refs/tags') }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: ${{ env.archive || contains(github.ref, 'refs/tags') }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -168,12 +168,12 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
          
       - name: Create release
-        if: ${{ env.archive || contains(github.ref, 'refs/tags') }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         id: create_release
         run: |
           echo "Create release: Creating release..."
 
-          if ${{ contains(github.ref, 'refs/tags') }}; then
+          if ${{ startsWith(github.ref, 'refs/tags') }}; then
             release_tag=$(basename ${{ github.ref }})'.'
           else
             if ${{ env.app_version != '' }}; then
