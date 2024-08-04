@@ -4,11 +4,13 @@ name: 'NCar-Unreal-Builder'
 run-name: |
   " ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
   | ${{ inputs.platform != '' && inputs.platform || 'Linux' }} 
-  | ${{ (inputs.archive && startsWith(github.ref, 'refs/tags')) && 'Release  ' || 'NoRelease' }} 
+  | ${{ (inputs.archive || startsWith(github.ref, 'refs/tags')) && 'Release  ' || 'NoRelease' }} 
   | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }} "
 
 on:
   push:
+  release:
+    types: []
   workflow_dispatch:
     inputs:
       app_version:
@@ -188,7 +190,30 @@ jobs:
 
           # TODO: enable this except testing
           #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
-          command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
+          - name: Create release
+                  if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+                  id: create_release
+                  run: |
+                    echo "Create release: Creating release..."
+
+                    if ${{ startsWith(github.ref, 'refs/tags') }}; then
+                      release_tag=$(basename ${{ github.ref }})'.'
+                    else
+                      if ${{ env.app_version != '' }}; then
+                        release_tag=${{ env.app_version }}'.'
+                      else
+                        release_tag=''
+                      fi
+                    fi
+
+                    # Add condition to avoid continuous loop
+                    if [[ ${{ github.event_name }} != 'release' ]]; then
+                      command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
+                      echo -e "Create release: commandline is:\n"$command
+                      sh -c "$command"
+                    else
+                      echo "Skipping release creation as it is triggered by a release event."
+                    fi
           echo -e "Create release: commandline is:\n"$command
           sh -c "$command"
 
