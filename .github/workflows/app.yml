@@ -118,11 +118,10 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         id: compress-output
         run: |
           # Check archive path exist
-          echo 'env.archive: '${{ env.archive }}'push tag exists: '${{ startsWith(github.ref, 'refs/tags') }}
           if [ ! -d "${{ env.archive_path }}" ]; then
             echo "Error: Package failed, archive output folder does not exist..."
             exit 2
@@ -156,12 +155,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -169,7 +168,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
          
       - name: Create release
-        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         id: create_release
         run: |
           echo "Create release: Creating release..."
