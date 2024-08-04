@@ -124,7 +124,7 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: env.archive=='true' || startsWith(github.ref, 'refs/tags')=='true'
+        if: env.archive=='true'||startsWith(github.ref, 'refs/tags')=='true'
         id: compress-output
         run: |
           # Check archive path exist
@@ -162,12 +162,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: env.archive=='true' || startsWith(github.ref, 'refs/tags')=='true'
+        if: env.archive=='true'||startsWith(github.ref, 'refs/tags')=='true'
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: env.archive=='true' || startsWith(github.ref, 'refs/tags')=='true'
+        if: env.archive=='true'||startsWith(github.ref, 'refs/tags')=='true'
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -175,7 +175,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
          
       - name: Create release
-        if: env.archive=='true' || startsWith(github.ref, 'refs/tags')=='true'
+        if: env.archive=='true'||startsWith(github.ref, 'refs/tags')=='true'
         id: create_release
         run: |
           echo "Create release: Creating release..."
