@@ -13,8 +13,6 @@ on:
       - '**'
     paths:
       - '**'
-    tags:
-      - '**'
   workflow_dispatch:
     inputs:
       app_version:
@@ -124,7 +122,7 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: env.archive=='true'||startsWith(github.ref, 'refs/tags')=='true'
+        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
         id: compress-output
         run: |
           # Check archive path exist
