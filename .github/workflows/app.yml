@@ -90,15 +90,6 @@ jobs:
         env: 
           m_runUatPath: "/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
         run: |
-          echo 'Build cook: Project path on runner is: '${{ github.workspace }}
-          echo 'Build cook: ref.tags: '${{ github.ref.tags }}
-          echo 'Build cook: ref.release_tag: '${{ github.ref.release_tag }}
-          echo 'Build cook: ref_name: '${{ github.ref_name }}
-          echo 'Build cook: ref_type: '${{ github.ref_type }}
-          echo 'Build cook: ref: '${{ github.ref }}
-          echo 'Build cook: base_ref: '${{ github.base_ref }}
-          echo 'Build cook: head_ref: '${{ github.head_ref }}     
-
           m_archivePath=${{ env.archive_path }}
           if [ "${m_archivePath:-1}"!="/"];then
             m_archivePath="${{ env.archive_path }}/"
