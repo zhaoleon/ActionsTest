@@ -190,9 +190,28 @@ jobs:
 
           # TODO: enable this except testing
           #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
-          command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
-          echo -e "Create release: commandline is:\n"$command
-          sh -c "$command"
+
+          release_name='Release '$release_tag${{ github.run_number }}
+          release_body='This would be the s3 url'
+      
+          response=$(curl \
+            -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d '{
+              "tag_name": "'$release_tag${{ github.run_number }}'",
+              "name": "'$release_name'",
+              "body": "'$release_body'",
+              "draft": false,
+              "prerelease": false
+            }')
+      
+          echo "Create release: response is:\n"$response
+
+          # command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
+          # echo -e "Create release: commandline is:\n"$command
+          # sh -c "$command"
 
       - name: Clean artifact
         if: always()
