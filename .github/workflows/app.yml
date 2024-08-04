@@ -97,6 +97,7 @@ jobs:
 
           # Make sure there is only one uproject file in the project.
           uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
+          
           if [ "$uprojectCount" != 1 ]; then
             echo "::error::$uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
             exit 3
