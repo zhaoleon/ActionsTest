@@ -193,9 +193,12 @@ jobs:
           # TODO: enable this except testing
           #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
 
+          #TODO: Create tag on workflow dispatch
+
+          #TODO: Correct the release name
           release_name='Release '$release_tag${{ github.run_number }}
           release_body='This would be the s3 url'
-      
+          
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
