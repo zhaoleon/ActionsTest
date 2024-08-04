@@ -97,8 +97,7 @@ jobs:
           echo 'Build cook: ref_type: '${{ github.ref_type }}
           echo 'Build cook: ref: '${{ github.ref }}
           echo 'Build cook: base_ref: '${{ github.base_ref }}
-          echo 'Build cook: head_ref: '${{ github.head_ref }}
-          echo 'Build cook: ref_type: '${{ github.ref_type }}          
+          echo 'Build cook: head_ref: '${{ github.head_ref }}     
 
           m_archivePath=${{ env.archive_path }}
           if [ "${m_archivePath:-1}"!="/"];then
