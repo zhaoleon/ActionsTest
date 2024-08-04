@@ -97,7 +97,7 @@ jobs:
 
           # Make sure there is only one uproject file in the project.
           uprojectCount=$(find .. -type f -name "*.uproject" | wc -l) 
-          
+
           if [ "$uprojectCount" != 1 ]; then
             echo "::error::$uprojectCount uproejct files exist.Please make sure there is only one uproject file in the project!"
             exit 3
@@ -120,7 +120,7 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: env.archive == 'true' || startsWith(github.ref, 'refs/tags') == 'true'
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         id: compress-output
         run: |
           # Check archive path exist
@@ -158,12 +158,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: ${{ steps.compress-output.outputs.release }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: ${{ steps.compress-output.outputs.release }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -171,7 +171,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
          
       - name: Create release
-        if: ${{ steps.compress-output.outputs.release }}
+        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
         id: create_release
         run: |
           echo "Create release: Creating release..."
