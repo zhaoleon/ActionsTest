@@ -13,6 +13,8 @@ on:
       - '**'
     paths:
       - '**'
+    tags:
+      - '**'
   workflow_dispatch:
     inputs:
       app_version:
