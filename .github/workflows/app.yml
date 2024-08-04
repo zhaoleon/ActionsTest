@@ -11,7 +11,7 @@ on:
   push:
     branches:
       - '**'
-    tags:
+    tags-ignore:
       - '**'
   workflow_dispatch:
     inputs:
