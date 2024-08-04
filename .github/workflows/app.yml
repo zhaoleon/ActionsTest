@@ -151,16 +151,17 @@ jobs:
 
             echo "Build cook: Unreal build cook run completed..."      
             echo "output-path=$zip_name" >> "$GITHUB_OUTPUT"
+            echo "relese=true" >> "$GITHUB_OUTPUT"
             echo "Build cook: zip file is: "$zip_name
           done
 
       - name: Show compress result
-        if: env.archive == 'true' || startsWith(github.ref, 'refs/tags') == 'true'
+        if: ${{ steps.compress-output.outputs.release }}
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: env.archive == 'true' || startsWith(github.ref, 'refs/tags') == 'true'
+        if: ${{ steps.compress-output.outputs.release }}
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -168,7 +169,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
          
       - name: Create release
-        if: env.archive == 'true' || startsWith(github.ref, 'refs/tags') == 'true'
+        if: ${{ steps.compress-output.outputs.release }}
         id: create_release
         run: |
           echo "Create release: Creating release..."
