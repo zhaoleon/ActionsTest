@@ -190,30 +190,7 @@ jobs:
 
           # TODO: enable this except testing
           #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
-          - name: Create release
-                  if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
-                  id: create_release
-                  run: |
-                    echo "Create release: Creating release..."
-
-                    if ${{ startsWith(github.ref, 'refs/tags') }}; then
-                      release_tag=$(basename ${{ github.ref }})'.'
-                    else
-                      if ${{ env.app_version != '' }}; then
-                        release_tag=${{ env.app_version }}'.'
-                      else
-                        release_tag=''
-                      fi
-                    fi
-
-                    # Add condition to avoid continuous loop
-                    if [[ ${{ github.event_name }} != 'release' ]]; then
-                      command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
-                      echo -e "Create release: commandline is:\n"$command
-                      sh -c "$command"
-                    else
-                      echo "Skipping release creation as it is triggered by a release event."
-                    fi
+          command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
           echo -e "Create release: commandline is:\n"$command
           sh -c "$command"
 
