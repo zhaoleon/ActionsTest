@@ -130,7 +130,7 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: ${{ env.archive || startsWith(github.ref, 'refs/tags') }}
+        if: env.archive=='true' || startsWith(github.ref, 'refs/tags') == 'true'
         id: compress-output
         run: |
           # Check archive path exist
