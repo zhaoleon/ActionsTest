@@ -9,8 +9,8 @@ run-name: |
 
 on:
   push:
-  release:
-    types: [prereleased]
+    branches:
+      - '**'
   workflow_dispatch:
     inputs:
       app_version:
