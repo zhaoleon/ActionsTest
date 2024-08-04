@@ -5,7 +5,7 @@ run-name: |
   " ${{ inputs.build_config != '' && inputs.build_config || 'Development' }} 
   | ${{ inputs.platform != '' && inputs.platform || 'Linux' }} 
   | ${{ (inputs.archive || startsWith(github.ref, 'refs/tags')) && 'Release  ' || 'NoRelease' }} 
-  | ${{ inputs.app_version != '' && inputs.app_version || github.run_number }} "
+  | ${{ inputs.app_version != '' && inputs.app_version || startsWith(github.ref, 'refs/tags') && github.ref.tags || github.run_number }} "
 
 on:
   push:
