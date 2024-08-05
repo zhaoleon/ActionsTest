@@ -181,12 +181,14 @@ jobs:
           echo "Create release: Creating release..."
 
           if ${{ startsWith(github.ref, 'refs/tags') }}; then
-            release_tag=$(basename ${{ github.ref }})'.'
+            release_tag=$(basename ${{ github.ref }})"."
+            echo "Create release: tag name is: "$release_tag
           else
             if ${{ env.app_version != '' }}; then
-              release_tag=${{ env.app_version }}'.'
+              release_tag=${{ env.app_version }}"."
+              echo "Create release: tag name is: "$release_tag
             else
-              release_tag=''
+              release_tag=""
             fi
           fi
 
@@ -196,8 +198,10 @@ jobs:
           #TODO: Create tag on workflow dispatch
 
           #TODO: Correct the release name
-          release_name='Release '$release_tag${{ github.run_number }}
+          release_name="Release "$release_tag"${{ github.run_number }}"
+          echo 'Create release: release title is: '$release_name
           release_body='This would be the s3 url'
+          echo 'Create release: release body is: '$release_body
           
           response=$(curl \
             -X POST \
