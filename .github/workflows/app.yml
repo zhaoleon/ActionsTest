@@ -228,7 +228,7 @@ jobs:
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
               # TODO: paste the s3 url here
-              \"body\": \"$request_body\"
+              \"body\": \"$request_body\",
               \"draft\": false,
               \"prerelease\": false
             }")
