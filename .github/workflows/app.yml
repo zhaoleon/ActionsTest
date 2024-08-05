@@ -129,22 +129,27 @@ jobs:
         run: |
           # Check archive path exist
           if [ ! -d "${{ env.archive_path }}" ]; then
-            echo "Error: Package failed, archive output folder does not exist..."
+            echo "Compress output error: Package failed, archive output folder does not exist..."
             exit 2
           fi
 
           # Rename the archive to add the version number
           for dir in ${{ env.archive_path }}*
           do
-            echo "Build cook: list files or folders: "$dir
-
-            if ${{ env.app_version != '' }}; then
-              version_version=_${{ env.app_version }}
+            echo "Compress output: list files or folders: "$dir
+            if ${{ startsWith(github.ref, 'refs/tags') }}; then
+              version_name="_"$(basename ${{ github.ref }})
+              echo "Compress output: "$version_name
             else
-              version_version=''
+              if ${{ env.app_version != '' }}; then
+                version_name=_${{ env.app_version }}
+                echo "Compress output: "$version_name
+              else
+                version_name=''
+              fi
             fi
 
-            new_name="NCar_Linux""$version_version""."${{ github.run_number }}
+            new_name="NCar_Linux""$version_name""."${{ github.run_number }}
             new_name_path="./Output/"$new_name
             echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
             mv "$dir" "$new_name_path"
