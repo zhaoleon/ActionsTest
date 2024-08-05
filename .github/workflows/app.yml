@@ -139,11 +139,9 @@ jobs:
             echo "Compress output: list files or folders: "$dir
             if ${{ startsWith(github.ref, 'refs/tags') }}; then
               version_name="_"$(basename ${{ github.ref }})
-              echo "Compress output: "$version_name
             else
               if ${{ env.app_version != '' }}; then
                 version_name=_${{ env.app_version }}
-                echo "Compress output: "$version_name
               else
                 version_name=''
               fi
@@ -151,7 +149,7 @@ jobs:
 
             new_name="NCar_Linux""$version_name""."${{ github.run_number }}
             new_name_path="./Output/"$new_name
-            echo "Build cook: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
+            echo "Compress output: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
             mv "$dir" "$new_name_path"
 
             echo "Build cook: Compressing output files..."
