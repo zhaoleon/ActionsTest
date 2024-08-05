@@ -221,7 +221,9 @@ jobs:
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
               # TODO: paste the s3 url here
-              \"body\": \"##Artifact download URI \n <s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}> \n ##Artifact download object URL \n <https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}>\",
+              \"body\": \
+                "##Artifact download URI \n [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}) \n \
+                 ##Artifact download object URL \n [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})\",
               \"draft\": false,
               \"prerelease\": false
             }")
