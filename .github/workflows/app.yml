@@ -211,10 +211,6 @@ jobs:
           
           release_name="Release "${{ env.tag_name }}
           echo 'Create release: release title is: '$release_name
-          # TODO: paste the s3 url here
-          # echo 'release_body={"Artifact download URI":"s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}", \ 
-          #   "Artifact download object URL":"https://ncar-cicd-artifact.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}"}' >> "$GITHUB_ENV"
-          # echo 'Create release: release body is: '$release_body
           
           response=$(curl \
             -X POST \
@@ -224,7 +220,8 @@ jobs:
             -d "{
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
-              \"body\": \"Artifact download URI: s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}, \n Artifact download object URL: https://ncar-cicd-artifact.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}\",
+              # TODO: paste the s3 url here
+              \"body\": \"##Artifact download URI \n <s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}> \n ##Artifact download object URL \n <https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}>\",
               \"draft\": false,
               \"prerelease\": false
             }")
