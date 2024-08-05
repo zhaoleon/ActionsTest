@@ -196,7 +196,7 @@ jobs:
           echo "tag_name=$release_tag" >> "$GITHUB_OUTPUT"
 
       - name: Create tag for workflow dispatch
-        if: github.event_name=='workflow_dispatch'
+        if: github.event_name=='workflow_dispatch'&&env.archive==true
         id: create-tag
         env: 
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
