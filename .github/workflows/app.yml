@@ -180,7 +180,7 @@ jobs:
         run: |
           echo "Create release: Creating release..."
 
-          if startsWith(github.ref, 'refs/tags'); then
+          if ${{ startsWith(github.ref, 'refs/tags') }}; then
             release_tag=$(basename ${{ github.ref }})'.'
           else
             if ${{ env.app_version != '' }}; then
