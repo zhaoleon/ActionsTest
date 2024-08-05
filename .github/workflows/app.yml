@@ -204,18 +204,19 @@ jobs:
         env: 
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
         run: |
-          echo "Create tag: workflow is triggered by: "${{ github.event_name }} ".So that create tag for release by workflow"
+          echo "Create tag: workflow is triggered by: "${{ github.event_name }}". So that create tag for release by workflow"
           echo "Create tag: tag name is: "${{ env.tag_name }}
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
+            https://api.github.com/repos/${{ github.repository }}/git/tags \
             -d "{
               \"tag\": \"${{ env.tag_name }})\",
               \"message\": \"Automatic tag created by workflow\",
               \"object\": \"${{ github.sha }}\",
-              \"type\": \"commit\"
+              \"type\": \"commit\",
+              \"tagger\": {\"name\": \"${{ github.actor }}\"}
             }")
       
           echo "Create tag: response is:\n"$response
