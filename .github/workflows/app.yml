@@ -219,17 +219,16 @@ jobs:
           #   https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}
           #   '''
           
+
           request_body=$(cat <<EOF
-          {
-            "##Artifact download URI": "[s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})",
-            "##Artifact download object URL": "[https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})"
-          }
+          ##Artifact download URI: [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})
+          ##Artifact download object URL: [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})
           EOF
           )
-          
-          # Escape newlines and double quotes for the JSON string
-          escaped_request_body=$(echo "$request_body" | jq -Rs .)
-          
+
+          # Manually escape double quotes and newlines
+          escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g' | tr '\n' '\\n')
+
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
@@ -238,12 +237,13 @@ jobs:
             -d "{
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
-              \"body\": $escaped_request_body,
+              \"body\": \"$escaped_request_body\",
               \"draft\": false,
               \"prerelease\": false
             }")
-          
+
           echo "Create release: response is:\n$response"
+          
           
       - name: Clean artifact
         if: always()
