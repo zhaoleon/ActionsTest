@@ -173,33 +173,62 @@ jobs:
           # upload to aws s3
           # TODO: complete the s3 url
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
-         
-      - name: Create release
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
-        id: create_release
+       
+      - name: Create tag name
+        id: create-tag-name
         run: |
-          echo "Create release: Creating release..."
+          echo "Create tag name: Creating tag name..."
 
           if ${{ startsWith(github.ref, 'refs/tags') }}; then
-            release_tag=$(basename ${{ github.ref }})"."
+            release_tag=$(basename ${{ github.ref }})"."${{ github.run_number }}
             echo "Create release: tag name is: "$release_tag
           else
             if ${{ env.app_version != '' }}; then
-              release_tag=${{ env.app_version }}"."
+              release_tag=${{ env.app_version }}"."${{ github.run_number }}
               echo "Create release: tag name is: "$release_tag
             else
-              release_tag=""
+              release_tag=${{ github.run_number }}
+              echo "Create release: tag name is: "$release_tag
             fi
           fi
+          
+          echo "tag_name=$release_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag for workflow dispatch
+        if: github.event_name=='workflow_dispatch'
+        id: create-tag
+        env: 
+          tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
+        run: |
+          echo "Create tag: workflow is triggered by: "${{ github.event_name }} ".So that create tag for release by workflow"
+          response=$(curl \
+            -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d "{
+              \"tag\": \"${{ env.tag_name }})\",
+              \"message\": \"Automatic tag created by workflow\",
+              \"object\": \"${{ github.sha }}\",
+              \"type\": \"commit\"
+            }")
+      
+          echo "Create tag: response is:\n"$response
+
+      - name: Create release
+        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        id: create_release
+        env:
+          tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
+        run: |
+          echo "Create release: Creating release..."
 
           # TODO: enable this except testing
-          #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw
-
-          #TODO: Create tag on workflow dispatch
-
-          #TODO: Correct the release name
-          release_name="Release "$release_tag"${{ github.run_number }}"
+          #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw       
+          
+          release_name="Release "${{ env.tag_name }}
           echo 'Create release: release title is: '$release_name
+          # TODO: paste the s3 url here
           release_body='This would be the s3 url'
           echo 'Create release: release body is: '$release_body
           
@@ -209,7 +238,7 @@ jobs:
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d "{
-              \"tag_name\": \"$(basename ${{ github.ref }})\",
+              \"tag_name\": \"$${{ env.tag_name }})\",
               \"name\": \"$release_name\",
               \"body\": \"$release_body\",
               \"draft\": false,
@@ -217,10 +246,6 @@ jobs:
             }")
       
           echo "Create release: response is:\n"$response
-
-          # command="gh release create '$release_tag'${{ github.run_number }} --generate-notes -t 'Release $release_tag'${{ github.run_number }} -n 'This would be the s3 url' --latest" 
-          # echo -e "Create release: commandline is:\n"$command
-          # sh -c "$command"
 
       - name: Clean artifact
         if: always()
