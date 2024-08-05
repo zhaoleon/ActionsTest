@@ -175,7 +175,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
        
       - name: Create tag name
-        if: env.archive==true
+        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
         id: create-tag-name
         run: |
           echo "Create tag name: Creating tag name..."
