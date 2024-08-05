@@ -212,11 +212,18 @@ jobs:
           release_name="Release "${{ env.tag_name }}
           echo 'Create release: release title is: '$release_name
           
+          # request_body='''
+          #   ##Artifact download URI
+          #   [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})
+          #   ##Artifact download object URL
+          #   [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})
+          #   '''
+
           request_body='''
-            ##Artifact download URI
-            [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})
+            Artifact download URI
+            s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}
             ##Artifact download object URL
-            [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})
+            https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}
             '''
 
           response=$(curl \
