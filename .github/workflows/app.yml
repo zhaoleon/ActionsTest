@@ -152,27 +152,27 @@ jobs:
             echo "Compress output: Changing output folder name from: "$(basename $dir)" to: "$new_name_path
             mv "$dir" "$new_name_path"
 
-            echo "Build cook: Compressing output files..."
+            echo "Compress output: Compressing output files..."
             cd Output
             zip_name=$new_name".zip"
             zip_folder=$new_name/*
             zip -rqu $zip_name $zip_folder
 
-            echo "Build cook: Unreal build cook run completed..."      
+            echo "Compress output: compress output archive completed..."      
             echo "output-path=$zip_name" >> "$GITHUB_OUTPUT"
             echo "relese=true" >> "$GITHUB_OUTPUT"
-            echo "Build cook: zip file is: "$zip_name
+            echo "Compress output: zip file is: "$zip_name
           done
 
       - name: Show compress result
         if: ${{ env.archive == 'true' || startsWith(github.ref, 'refs/tags') }}
         run: |
-          echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
+          echo "Compress output: zip file is in ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
         if: ${{ env.archive == 'true' || startsWith(github.ref, 'refs/tags') }}
         run: |
-          echo "Uploading to a wonderful S3 bucket."
+          echo "Upload: uploading to a wonderful S3 bucket."
           # upload to aws s3
           # TODO: complete the s3 url
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
@@ -185,14 +185,14 @@ jobs:
 
           if ${{ startsWith(github.ref, 'refs/tags') }}; then
             release_tag=$(basename ${{ github.ref }})"."${{ github.run_number }}
-            echo "Create release: tag name is: "$release_tag
+            echo "Create tag name: tag name is: "$release_tag
           else
             if ${{ env.app_version != '' }}; then
               release_tag=${{ env.app_version }}"."${{ github.run_number }}
-              echo "Create release: tag name is: "$release_tag
+              echo "Create tag name: tag name is: "$release_tag
             else
               release_tag=${{ github.run_number }}
-              echo "Create release: tag name is: "$release_tag
+              echo "Create tag name: tag name is: "$release_tag
             fi
           fi
           
@@ -205,6 +205,7 @@ jobs:
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
         run: |
           echo "Create tag: workflow is triggered by: "${{ github.event_name }} ".So that create tag for release by workflow"
+          echo "Create tag: tag name is: "${{ env.tag_name }}
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
