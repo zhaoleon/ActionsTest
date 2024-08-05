@@ -176,6 +176,8 @@ jobs:
           # upload to aws s3
           # TODO: complete the s3 url
           aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://ncar-cicd-artifact/artifact/
+
+          # TODO: pass the status to clean step to determine whether the bucket should be cleaned
        
       - name: Create tag name
         if: ${{ env.archive == 'true' || startsWith(github.ref, 'refs/tags') }}
@@ -206,7 +208,7 @@ jobs:
         run: |
           echo "Create release: Creating release..."
 
-          # Optional: Authenticate with GitHub CLI (uncomment if needed)
+          # TODO: Authenticate with GitHub CLI (uncomment if needed)
           # echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw       
 
           # Define the release name
@@ -214,6 +216,7 @@ jobs:
           echo "Create release: release title is: $release_name"
 
           # Define the Markdown body for the release
+          # TODO: replace the uri to as it is
           request_body="### Artifact download URI \\n s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}\\n\\n### Artifact download object URL \\n https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}"
 
           # Escape double quotes
@@ -241,4 +244,5 @@ jobs:
         run: |
           echo "Deleting intermediate artifact..."
           rm -rf ${{ github.workspace }}/*
+          # TODO: clean the s3 bucket when failed or cancelled if the upload already finished
 
