@@ -224,8 +224,7 @@ jobs:
             -d "{
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
-              \"body\": \"Artifact download URI:s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}, \ 
-            Artifact download object URL:https://ncar-cicd-artifact.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}\",
+              \"body\": \"Artifact download URI: s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}, \n Artifact download object URL: https://ncar-cicd-artifact.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}\",
               \"draft\": false,
               \"prerelease\": false
             }")
