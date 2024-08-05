@@ -214,7 +214,7 @@ jobs:
           echo "Create release: release title is: $release_name"
 
           # Define the Markdown body for the release
-          request_body="## Artifact download URI: [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})\\n\\n## Artifact download object URL: [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})"
+          request_body="### Artifact download URI \\n s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}\\n\\n### Artifact download object URL \\n https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}"
 
           # Escape double quotes
           escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g')
