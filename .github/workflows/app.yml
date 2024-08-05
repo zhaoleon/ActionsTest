@@ -198,28 +198,28 @@ jobs:
           
           echo "tag_name=$release_tag" >> "$GITHUB_OUTPUT"
 
-      - name: Create tag for workflow dispatch
-        if: ${{ github.event_name=='workflow_dispatch' && env.archive == 'true' }}
-        id: create-tag
-        env: 
-          tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
-        run: |
-          echo "Create tag: workflow is triggered by: "${{ github.event_name }}". So that create tag for release by workflow"
-          echo "Create tag: tag name is: "${{ env.tag_name }}
-          response=$(curl \
-            -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/git/tags \
-            -d "{
-              \"tag\": \"${{ env.tag_name }})\",
-              \"message\": \"Automatic tag created by workflow\",
-              \"object\": \"${{ github.sha }}\",
-              \"type\": \"commit\",
-              \"tagger\": {\"name\": \"${{ github.actor }}\"}
-            }")
+      # - name: Create tag for workflow dispatch
+      #   if: ${{ github.event_name=='workflow_dispatch' && env.archive == 'true' }}
+      #   id: create-tag
+      #   env: 
+      #     tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
+      #   run: |
+      #     echo "Create tag: workflow is triggered by: "${{ github.event_name }}". So that create tag for release by workflow"
+      #     echo "Create tag: tag name is: "${{ env.tag_name }}
+      #     response=$(curl \
+      #       -X POST \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #       https://api.github.com/repos/${{ github.repository }}/git/tags \
+      #       -d "{
+      #         \"tag\": \"${{ env.tag_name }})\",
+      #         \"message\": \"Automatic tag created by workflow\",
+      #         \"object\": \"${{ github.sha }}\",
+      #         \"type\": \"commit\",
+      #         \"tagger\": {\"name\": \"${{ github.actor }}\"}
+      #       }")
       
-          echo "Create tag: response is:\n"$response
+      #     echo "Create tag: response is:\n"$response
 
       - name: Create release
         if: ${{ env.archive == 'true' || startsWith(github.ref, 'refs/tags') }}
