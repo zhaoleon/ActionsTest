@@ -124,7 +124,7 @@ jobs:
           sh -c "$command"
       
       - name: Compress output
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         id: compress-output
         run: |
           # Check archive path exist
@@ -162,12 +162,12 @@ jobs:
           done
 
       - name: Show compress result
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         run: |
           echo "zip file is in: ./Output/"${{ steps.compress-output.outputs.output-path }}
 
       - name: Upload archive to S3
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         run: |
           echo "Uploading to a wonderful S3 bucket."
           # upload to aws s3
@@ -175,7 +175,7 @@ jobs:
           # aws s3 cp ./Output/${{ steps.compress-output.outputs.output-path }} s3://
        
       - name: Create tag name
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         id: create-tag-name
         run: |
           echo "Create tag name: Creating tag name..."
@@ -196,7 +196,7 @@ jobs:
           echo "tag_name=$release_tag" >> "$GITHUB_OUTPUT"
 
       - name: Create tag for workflow dispatch
-        if: github.event_name=='workflow_dispatch'&&env.archive==true
+        if: github.event_name=='workflow_dispatch' && env.archive
         id: create-tag
         env: 
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
@@ -217,7 +217,7 @@ jobs:
           echo "Create tag: response is:\n"$response
 
       - name: Create release
-        if: env.archive==true||startsWith(github.ref, 'refs/tags')==true
+        if: env.archive || startsWith(github.ref, 'refs/tags')
         id: create_release
         env:
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
