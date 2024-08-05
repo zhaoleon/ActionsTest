@@ -206,36 +206,27 @@ jobs:
         run: |
           echo "Create release: Creating release..."
 
-          # TODO: enable this except testing
-          #echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw       
-          
-          release_name="Release "${{ env.tag_name }}
-          echo 'Create release: release title is: '$release_name
-                    
-          # request_body='''
-          #   Artifact download URI
-          #   s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}
-          #   ##Artifact download object URL
-          #   https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}
-          #   '''
-          
+          # Optional: Authenticate with GitHub CLI (uncomment if needed)
+          # echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw       
 
-          request_body=$(cat <<EOF
-          ##Artifact download URI: [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})
-          ##Artifact download object URL: [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})
-          EOF
-          )
+          # Define the release name
+          release_name="Release ${env.tag_name}"
+          echo "Create release: release title is: $release_name"
 
-          # Manually escape double quotes and newlines
-          escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g' | tr '\n' '\\n')
+          # Define the Markdown body for the release
+          request_body="## Artifact download URI: [s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})\\n\\n## Artifact download object URL: [https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})"
 
+          # Escape double quotes
+          escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g')
+
+          # Create the release
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d "{
-              \"tag_name\": \"${{ env.tag_name }}\",
+              \"tag_name\": \"${env.tag_name}\",
               \"name\": \"$release_name\",
               \"body\": \"$escaped_request_body\",
               \"draft\": false,
@@ -243,8 +234,7 @@ jobs:
             }")
 
           echo "Create release: response is:\n$response"
-          
-          
+                 
       - name: Clean artifact
         if: always()
         id: clean-artifact
