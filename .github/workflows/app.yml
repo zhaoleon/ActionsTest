@@ -242,7 +242,7 @@ jobs:
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d "{
-              \"tag_name\": \"${{ env.tag_name }})\",
+              \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
               \"body\": \"$release_body\",
               \"draft\": false,
