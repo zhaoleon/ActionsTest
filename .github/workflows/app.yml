@@ -211,15 +211,7 @@ jobs:
           
           release_name="Release "${{ env.tag_name }}
           echo 'Create release: release title is: '$release_name
-          
-          request_body=$(cat <<EOF
-          {
-            "##Artifact download URI":"[s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})",
-            "##Artifact download object URL":"[https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})"
-          }
-          EOF
-          )
-
+                    
           # request_body='''
           #   Artifact download URI
           #   s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}
@@ -227,7 +219,17 @@ jobs:
           #   https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}
           #   '''
           
-          # TODO: paste the s3 url here
+          request_body=$(cat <<EOF
+          {
+            "##Artifact download URI": "[s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }}](s3://ncar-cicd-artifact/artifact/${{ steps.compress-output.outputs.output-path }})",
+            "##Artifact download object URL": "[https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }}](https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/artifact/${{ steps.compress-output.outputs.output-path }})"
+          }
+          EOF
+          )
+          
+          # Escape newlines and double quotes for the JSON string
+          escaped_request_body=$(echo "$request_body" | jq -Rs .)
+          
           response=$(curl \
             -X POST \
             -H "Accept: application/vnd.github.v3+json" \
@@ -236,13 +238,13 @@ jobs:
             -d "{
               \"tag_name\": \"${{ env.tag_name }}\",
               \"name\": \"$release_name\",
-              \"body\": \"$request_body\",
+              \"body\": $escaped_request_body,
               \"draft\": false,
               \"prerelease\": false
             }")
-      
-          echo "Create release: response is:\n"$response
-
+          
+          echo "Create release: response is:\n$response"
+          
       - name: Clean artifact
         if: always()
         id: clean-artifact
