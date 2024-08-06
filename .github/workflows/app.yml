@@ -228,7 +228,7 @@ jobs:
           # Create the release
           response=$(curl \
             -X POST \
-            -H "Accept: application/vnd.github+json" \
+            -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://github.com/api/v3/repos/${{ github.repository }}/releases \
             -d "{
