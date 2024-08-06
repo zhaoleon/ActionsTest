@@ -238,7 +238,7 @@ jobs:
               \"draft\": false,
               \"prerelease\": false
             }")
-
+          echo "::error:: testing, delete this when commit"
           echo "Create release: response is:\n$response"
       
       - name: Clean s3 bucket
