@@ -65,6 +65,8 @@ env:
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
 
   s3_bucket: 's3://ncar-cicd-artifact'
+  s3_object_url: 'https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com'
+  UatPath: '/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh'
 
 jobs:
   build-app:
@@ -89,8 +91,6 @@ jobs:
 
       - name: Build cook package
         id: build-cook-package        
-        env: 
-          m_runUatPath: "/home/ubuntu/UnrealEngine/Engine/Build/BatchFiles/RunUAT.sh"
         run: |
           m_archivePath=${{ env.archive_path }}
           if [ "${m_archivePath:-1}"!="/"];then
@@ -118,7 +118,7 @@ jobs:
             archiveArg=""
           fi
 
-          command="${{ env.m_runUatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+          command="${{ env.UatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
 
           echo -e "buildcookrun commandline is:\n"$command
           sh -c "$command"
@@ -213,18 +213,14 @@ jobs:
         env:
           tag_name: ${{ steps.create-tag-name.outputs.tag_name }}
         run: |
-          echo "Create release: Creating release..."
-
-          # TODO: Authenticate with GitHub CLI (uncomment if needed)
-          # echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token --hostname atc-github.azure.cloud.bmw       
+          echo "Create release: Creating release..."    
 
           # Define the release name
           release_name="Release ${{env.tag_name}}"
           echo "Create release: release title is: $release_name"
 
           # Define the Markdown body for the release
-          # TODO: replace the uri to as it is
-          request_body="### Artifact download URI \\n ${{ steps.upload-archive.outputs.s3_url_output }}\\n\\n### Artifact download object URL \\n https://ncar-cicd-artifact.s3.ap-southeast-1.amazonaws.com/${{ steps.upload-archive.outputs.s3_url_output_nobucket  }}"
+          request_body="### Artifact download URI \\n ${{ steps.upload-archive.outputs.s3_url_output }}\\n\\n### Artifact download object URL \\n ${{ env.s3_object_url }}/${{ steps.upload-archive.outputs.s3_url_output_nobucket  }}"
 
           # Escape double quotes
           escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g')
@@ -232,9 +228,9 @@ jobs:
           # Create the release
           response=$(curl \
             -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
+            -H "Accept: application/vnd.github+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
+            https://github.com/api/v3/repos/${{ github.repository }}/releases \
             -d "{
               \"tag_name\": \"${{env.tag_name}}\",
               \"name\": \"$release_name\",
@@ -244,13 +240,6 @@ jobs:
             }")
 
           echo "Create release: response is:\n$response"
-                 
-      - name: Clean artifact
-        if: always()
-        id: clean-artifact
-        run: |
-          echo "Deleting intermediate artifact..."
-          rm -rf ${{ github.workspace }}/*
       
       - name: Clean s3 bucket
         if: failure() || cancelled()
@@ -261,3 +250,9 @@ jobs:
             aws s3 rm ${{ steps.upload-archive.outputs.s3_url_output}}
           fi
 
+      - name: Clean artifact
+        if: always()
+        id: clean-artifact
+        run: |
+          echo "Deleting intermediate artifact..."
+          rm -rf ${{ github.workspace }}/*
