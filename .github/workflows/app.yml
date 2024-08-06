@@ -38,14 +38,14 @@ on:
           - 'DebugGame'
           - 'Shipping'
         default: 'Development'
-      platform:
-        description: 'Platform to build for'
-        type: choice
-        required: false
-        options:
-          - 'Win64'
-          - 'Linux'
-        default: 'Linux'
+      # platform:
+      #   description: 'Platform to build for'
+      #   type: choice
+      #   required: false
+      #   options:
+      #     - 'Win64'
+      #     - 'Linux'
+      #   default: 'Linux'
       maps:
         description: 'Maps to be packaged'
         required: false
@@ -57,9 +57,10 @@ on:
 
 env: 
   app_version: ${{ inputs.app_version !='' && inputs.app_version || '' }}
-  #environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
+  # environment: ${{ inputs.environment != '' && inputs.environment || 'DEV' }} 
   build_config: ${{ inputs.build_config !='' && inputs.build_config || 'Development' }} 
-  platform: ${{ inputs.platform !='' && inputs.platform || 'Linux' }} 
+  platform: 'Linux' 
+  # ${{ inputs.platform !='' && inputs.platform || 'Linux' }} 
   archive: ${{ (inputs.archive && true) && 'true' || 'false' }}
   archive_path: '${{ github.workspace }}/Output/'
   maps: ${{ inputs.maps !='' && inputs.maps || '' }}
