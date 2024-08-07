@@ -119,7 +119,7 @@ jobs:
             archiveArg=""
           fi
 
-          command="${{ env.UatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output"
+          command="${{ env.UatPath }} BuildCookRun -project=$uprojectPath -clientconfig=${{ env.build_config }} -platform=${{ env.platform }} $mapsArg -clean -cook -stage -pak -package $archiveArg -encryptinifiles -noP4 -build -unattended -utf8output -RunAutomationTests"
 
           echo -e "buildcookrun commandline is:\n"$command
           sh -c "$command"
