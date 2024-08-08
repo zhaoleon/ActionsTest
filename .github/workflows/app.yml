@@ -223,10 +223,7 @@ jobs:
           echo "Create release: release title is: $release_name"
 
           # Define the Markdown body for the release
-          request_body=\
-          "### Artifact download URI \\n ${{ steps.upload-archive.outputs.s3_url_output }}\\n
-           ### Artifact download object URL \\n ${{ env.s3_object_url }}/${{ steps.upload-archive.outputs.s3_url_output_nobucket  }} \\n \
-           ### Artifact download presigned URL \\n [Download](${{ steps.upload-archive.outputs.s3_presigned_url_output }})"
+          request_body="### Artifact download URI \\n ${{ steps.upload-archive.outputs.s3_url_output }}\\n ### Artifact download object URL \\n ${{ env.s3_object_url }}/${{ steps.upload-archive.outputs.s3_url_output_nobucket  }} \\n ### Artifact download presigned URL \\n [Download](${{ steps.upload-archive.outputs.s3_presigned_url_output }})"
 
           # Escape double quotes
           escaped_request_body=$(echo "$request_body" | sed 's/"/\\"/g')
